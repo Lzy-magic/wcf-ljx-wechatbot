@@ -1,0 +1,138 @@
+## 超级管理员配置
+Administrators:
+  - ''
+
+## 系统配置
+systemConfig:
+  robotName: '小爱'
+
+## 定时发送配置
+scheduleConfig:
+  # 定时任务列表
+  taskList:
+   早报推送: 'morningPage'
+   摸鱼日历: 'fishPage'
+   AI晚报: 'aiNews'
+   晚安推送: 'goodNight'
+   节日祝福: 'festival'
+   生日提醒: 'birthday'
+   天气推送: 'weatherReport'
+   房源推送: 'beikeReport'
+  # 早报推送时间
+  morningPageTime: '10:20'
+  # 摸鱼日记推送时间设置
+  fishTime: '18:00'
+  # AI晚报时间设置
+  aiNewsTime: '20:00'
+  # 晚安推送时间
+  goodNightTime: '21:50'
+  # 节日祝福推送时间
+  festivalTime: '20:30'
+  # 生日提醒时间
+  birthdayTime: '09:00'
+  # 天气推送时间
+  weatherReportTime: '06:30'
+  # 房源推送时间
+  beikeReportTime: '21:00'
+  # 清除缓存时间
+  clearCacheTime: '03:00'
+  festival:
+    除夕: '01-27'
+    春节: '01-28'
+    元宵节: '01-11'
+    情人节: '01-13'
+    女神节: '03-08'
+    劳动节: '04-30'
+    国庆节: '09-30'
+    元旦: '12-31'
+  birthday:
+    爸爸: '11-08'
+    妈妈: '02-25'
+    大哥: '07-17'
+    二哥: '08-04'
+    姐姐: '08-26'
+  weather_district:
+    - '上海杨浦区'
+
+## 进群关键词配置
+roomKeyWord:
+  加群: xxx@chatroom
+  进群: xxx@chatroom
+
+## 自定义关键词回复
+customKeyWord:
+  gzhRetrive: '猴哥'
+  difySearch: '搜索'
+  beikeRetrive:
+    - '挂牌'
+    - '成交'
+
+## 管理功能关键词配置
+adminFunctionWord:
+  # 新增私聊/群聊白名单
+  addWhiteWord: '加白'
+  # 删除私聊/群聊白名单
+  delWhiteWord: '删白'
+  # 新增管理员关键词
+  addAdminWord:
+    - '添加管理员'
+  # 删除管理员关键词
+  delAdminWord:
+    - '删除管理员'
+  # 踢人关键词
+  delUserWord:
+    - '踢'
+    - '已踢'
+
+## API接口服务配置
+apiServer:
+  # 高德 Key
+  gaoDeKey: ''
+  # alapi
+  alKey: ''
+  alApi: 'https://v2.alapi.cn/api'
+  # hzapi
+  hzKey: ''
+  hzApi: 'https://cn.apihz.cn/api/img/apihzbqbsougou.php'
+  # imgrender 
+  imgRenderKey: ''
+  imgRenderApi: 'https://api.imgrender.cn/open/v1/pics'
+  # dpApi
+  dpKey: ''
+  # 摸鱼日记API
+  dpfishApi: "https://api.dudunas.top/api/moyu"
+  # 腾讯元器
+  yuanqiToken: ''
+  yuanqiAssistant: ''
+  yuanqiUser: ''
+  yuanqiApi: 'https://yuanqi.tencent.com/openapi/v1/agent/chat/completions'
+  # 获取房源信息 - 需自己搭建服务（可忽略）
+  beike_db_api: "http://xxx:2001"
+  beike_query_district: ['黄浦区', '杨浦区']
+
+## LLM接口服务配置
+llmServer:
+  # OneAPI配置
+  oa_api_key: ''
+  oa_base_url: 'http://xxx:4000/v1'
+  model_name_list:
+   - 'gemini-1.5-flash'
+   - 'glm4-flash'
+   - 'glm4-9b'
+   - 'internlm'
+   - 'qwen2-7b'
+   - 'ernie-128k'
+  # 硅基流动API配置
+  sf_api_key: ''
+  # intermLM API配置
+  il_api_key: ''
+  # groq API配置
+  groq_api_key: ''
+  # dify API配置, 不同key对应不同智能体
+  dify_api_url: 'http://xxx:3000/dify/'
+  dify_search_key: 'app-'
+  dify_image_key: 'app-'
+  # 本地部署API配置
+  video_api_url: 'http://xxx:3000/generate-video/'
+  math_api_url: 'http://xxx:3000/math/'
+  math_output_url: 'http://xxx:3000/math_output/'

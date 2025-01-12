@@ -1,0 +1,6 @@
+wcferry==39.3.3.2
+PyYAML==6.0.2
+schedule
+lunarcalendar
+bs4
+openai

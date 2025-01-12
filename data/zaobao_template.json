@@ -1,0 +1,128 @@
+{
+    "width": 720,
+    "height": 1280,
+    "backgroundColor": "#FFFFFF",
+    "lines":[
+        {
+            "startX": 1,
+            "startY": 1,
+            "endX": 1,
+            "endY": 1280,
+            "width": 4,
+            "color": "#E1E1E1",
+            "zIndex": 1
+        },
+        {
+            "startX": 0,
+            "startY": 0,
+            "endX": 720,
+            "endY": 0,
+            "width": 4,
+            "color": "#E1E1E1",
+            "zIndex": 1
+        },
+        {
+            "startX": 720,
+            "startY": 0,
+            "endX": 720,
+            "endY": 1280,
+            "width": 4,
+            "color": "#E1E1E1",
+            "zIndex": 1
+        },
+        {
+            "startX": 0,
+            "startY": 1280,
+            "endX": 720,
+            "endY": 1280,
+            "width": 4,
+            "color": "#E1E1E1",
+            "zIndex": 1
+        },
+        {
+            "startX": 10,
+            "startY": 205,
+            "endX": 710,
+            "endY": 205,
+            "width": 4,
+            "color": "#E1E1E1",
+            "zIndex": 1
+        },
+        {
+            "startX": 10,
+            "startY": 285,
+            "endX": 710,
+            "endY": 285,
+            "width": 2,
+            "color": "#E1E1E1",
+            "zIndex": 1
+        }
+    ],
+    
+    "texts":[
+        {
+            "x": 225,
+            "y": 20,
+            "text": "小爱早报",
+            "font": "jiangxizhuokai",
+            "fontSize": 60,
+            "color": "#fff",
+            "width": 252,
+            "textAlign": "left",
+            "zIndex": 2
+        },
+        {
+            "x": 350,
+            "y": 110,
+            "text": "有钱能治愈一切伤悲，善良没用，你得有用",
+            "font": "jiangxizhuokai",
+            "fontSize": 30,
+            "color": "#000",
+            "width": 600,
+            "textAlign": "center",
+            "zIndex": 2
+        },
+        {
+            "x": 200,
+            "y": 210,
+            "text": "每天 60 秒看世界",
+            "font": "jiangxizhuokai",
+            "fontSize": 40,
+            "color": "#EA1A1A",
+            "width": 330,
+            "textAlign": "left",
+            "zIndex": 2
+        },
+        {
+            "x": 535,
+            "y": 255,
+            "text": "2024.10.17 星期4",
+            "font": "jiangxizhuokai",
+            "fontSize": 20,
+            "color": "#4A4D4E",
+            "width": 200,
+            "textAlign": "left",
+            "zIndex": 2
+        }
+    ],
+    
+    "images":[
+        {
+            "x": 10,
+            "y": 10,
+            "width": 700,
+            "height": 190,
+            "url": "https://axcvs2xtkbpq.objectstorage.ap-singapore-1.oci.customer-oci.com/n/axcvs2xtkbpq/b/bucket-20240802-0845/o/head.png",
+            "borderRadius": 10,
+            "zIndex": 1
+        },
+        {
+            "x": 10,
+            "y": 1010,
+            "width": 700,
+            "height": 270,
+            "url": "https://axcvs2xtkbpq.objectstorage.ap-singapore-1.oci.customer-oci.com/n/axcvs2xtkbpq/b/bucket-20240802-0845/o/houge_gzh_qrcode.png",
+            "zIndex": 1
+        }
+    ]
+}

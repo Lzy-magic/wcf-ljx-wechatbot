@@ -1,0 +1,9 @@
+**/__pycache__/
+data/*
+!data/zaobao_template.json
+logs/
+output/
+*.txt
+!requirements.txt
+test.py
+config.yaml
