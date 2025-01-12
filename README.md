@@ -6,9 +6,9 @@
 
 ## 📖 1、项目介绍
 
-<h4 align="left">
-一个基于 [WeChatFerry](https://github.com/lich0821/WeChatFerry) 的微信机器人。
-</h4>
+
+**一个基于 [WeChatFerry](https://github.com/lich0821/WeChatFerry) 的微信机器人。**
+
 
 **支持自动拉人，自动群发，入群欢迎，AI回复，关键词回复，定时任务等功能！如果有更多需求，欢迎进群交流！**
 
@@ -21,17 +21,11 @@
 **如果你觉得此项目不错，可以给个Star，或者关注一下公众号**
 
 
-<div style="display: flex;">
-  <div style="width: 400px; height: 400px; margin: 5px;">
-    <img src="./assets/gzh_code.jpg" alt="Image 1" style="width: 100%; height: 100%;">
-    <p style="text-align: center;">后台回复 `加群` 进群交流</p>
-  </div>
-  <div style="width: 400px; height: 400px; margin: 5px;">
-    <img src="./assets/star_code.jpg" alt="Image 2" style="width: 100%; height: 100%;">
-    <p style="text-align: center;">如果你觉得有用</p>
-  </div>
-</div>
 
+
+| ![Image 1](./assets/gzh_code.jpg) | ![Image 2](./assets/star_code.jpg) |
+|:-:|:-:|
+| 后台回复 `加群` 进群交流 | 如果你觉得有用 |
 
 ## 📖 2、项目结构
 
