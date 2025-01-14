@@ -124,14 +124,14 @@ class MsgHandler:
         if triggerType == 'gzhRetrive':
             # 调用指定公众号文章进行回复
             response = self.aps.get_yuanqi(content)
-            self.sendTextMsg(msg, bot_answer)
+            self.sendTextMsg(msg, response)
             self.lra.updateMessage(chatid, [msg.content, response])
         elif triggerType == 'difySearch':
             # 调用dify搜索智能体进行回复
             pre_text = f'{self.bot_name}正在调用搜索引擎为您服务，请耐心等待哦，预计20-60s'
             self.sendTextMsg(msg, pre_text)
             response = self.lta.difySearch(content, user=self.bot_name)
-            self.sendTextMsg(msg, bot_answer)
+            self.sendTextMsg(msg, response)
             self.lra.updateMessage(chatid, [msg.content, response])
         elif triggerType == 'beikeRetrive':
             match = re.search(r'\d+', content)
