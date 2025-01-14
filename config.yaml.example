@@ -17,7 +17,7 @@ scheduleConfig:
    节日祝福: 'festival'
    生日提醒: 'birthday'
    天气推送: 'weatherReport'
-   房源推送: 'beikeReport'
+   GitHub推送: 'githubReport'
   # 早报推送时间
   morningPageTime: '10:20'
   # 摸鱼日记推送时间设置
@@ -32,15 +32,15 @@ scheduleConfig:
   birthdayTime: '09:00'
   # 天气推送时间
   weatherReportTime: '06:30'
-  # 房源推送时间
-  beikeReportTime: '21:00'
+  # Github推送时间
+  githubReportTime: '21:00'
   # 清除缓存时间
   clearCacheTime: '03:00'
   festival:
     除夕: '01-27'
     春节: '01-28'
     元宵节: '01-11'
-    情人节: '01-13'
+    情人节: '02-13'
     女神节: '03-08'
     劳动节: '04-30'
     国庆节: '09-30'
@@ -48,9 +48,6 @@ scheduleConfig:
   birthday:
     爸爸: '11-08'
     妈妈: '02-25'
-    大哥: '07-17'
-    二哥: '08-04'
-    姐姐: '08-26'
   weather_district:
     - '上海杨浦区'
 

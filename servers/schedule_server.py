@@ -122,6 +122,16 @@ class ScheduleTaskServer:
                 self.wcf.send_text(msg=content, receiver=room_id)
             logger.info(f'房源信息推送给{room_name}成功')
         
+    def pushGitHubReport(self):
+        week_day = datetime.now().weekday()
+        if week_day == 6:
+            room_items = self.drs.showPushRoom(taskName='githubReport')
+            logger.info(f'准备推送给群: {room_items}')
+            for room_id, room_name in room_items:
+                content = self.lta.getGithubTrending()
+                self.wcf.send_text(msg=content, receiver=room_id)
+                logger.info(f'GitHub热榜推送给{room_name}成功')
+
     def clearCache(self):
         clearCacheFolder()
         logger.info('缓存清理成功')
@@ -136,6 +146,7 @@ class ScheduleTaskServer:
         schedule.every().day.at(configData['birthdayTime']).do(self.pushBirthdayWish)
         schedule.every().day.at(configData['weatherReportTime']).do(self.pushWeatherReport)
         schedule.every().day.at(configData['beikeReportTime']).do(self.pushBeikeReport)
+        schedule.every().day.at(configData['githubReportTime']).do(self.pushGitHubReport)
         schedule.every().day.at(configData['clearCacheTime']).do(self.clearCache)
         while True:
             schedule.run_pending()

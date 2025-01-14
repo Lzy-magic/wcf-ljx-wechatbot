@@ -288,8 +288,9 @@ class LLMTaskApi:
         self.dify_api_url = config['dify_api_url']
         self.dify_search_key = config['dify_search_key']
         self.dify_image_key = config['dify_image_key']
+        self.model_name_list = config['model_name_list']
 
-    def getWeather(self, address='上海杨浦区', model_name_list=['glm4-9b', 'glm4-flash', 'internlm']):
+    def getWeather(self, address='上海杨浦区'):
         wea_cast = self.gaoDeApi.get_weather(address, extensions='all')
         forecasts = wea_cast['forecasts'][0]['casts']
         today_cast = json.dumps(forecasts[0], ensure_ascii=False)
@@ -298,42 +299,42 @@ class LLMTaskApi:
                     {'role': 'system', 'content': sys_weather_report},
                     {'role': 'user', 'content': f'地名：{address}；今日天气：{today_cast}；未来三天：{future_cast}'},
                 ]
-        result = unillm(model_name_list, messages=messages)
+        result = unillm(['glm4-9b', 'glm4-flash'] + self.model_name_list, messages=messages)
         return result
     
     def getBeike(self,):
         texts = self.beikeApi.send_beike()
         return texts
     
-    def getGoodNight(self, model_name_list=['gemini-1.5-flash', 'gemini-1.5-pro', 'glm4-flash']):
+    def getGoodNight(self):
         messages = [
                 {'role': 'system', 'content': sys_base_prompt},
                 {'role': 'user', 'content': '夜深了，给大家发送一份晚安祝福，提醒不要熬夜，早睡早起等等，文风轻松活泼，不超过50字。直接给出晚安祝福即可，不要回答“好的”'}
             ]
-        result = unillm(model_name_list, messages=messages, temperature=0.9)
+        result = unillm(self.model_name_list, messages=messages, temperature=0.9)
         return result.strip()
     
-    def birthdayWish(self, name, solar='', lunar='', model_name_list=['gemini-1.5-flash', 'gemini-1.5-pro', 'glm4-flash']):
+    def birthdayWish(self, name, solar='', lunar=''):
         messages = [
                 {'role': 'system', 'content': sys_birthday_wish},
                 {'role': 'user', 'content': f'阳历{solar}，阴历{lunar}，人物{name}'},
             ]
-        result = unillm(model_name_list, messages=messages)
+        result = unillm(self.model_name_list, messages=messages)
         return result.strip()
     
-    def festivalWish(self, festival, room_name, model_name_list=['gemini-1.5-flash', 'gemini-1.5-pro', 'glm4-flash']):
+    def festivalWish(self, festival, room_name):
         robot_name = returnConfigData()['systemConfig']['robotName']
         messages = [
                 {'role': 'system', 'content': f'你是群管理员{robot_name}，明天就是<节日名称>，给<群名称>的小伙伴发一段节日祝福，预祝大家节日快乐，文风轻松活泼一些'},
                 {'role': 'user', 'content': f'节日名称：{festival}，群名称：{room_name}'},
             ]
-        result = unillm(model_name_list, messages=messages)
+        result = unillm(self.model_name_list, messages=messages)
         return result.strip()
 
-    def roomWelcome(self, room_name, invitee, index, model_name_list=['gemini-1.5-flash', 'gemini-1.5-pro', 'glm4-flash']):
+    def roomWelcome(self, room_name, invitee, index):
         text = f'你现在是<{room_name}>群的管理员，<{invitee}>是刚加入群的第{index}位新朋友，结合新朋友的昵称，写一段欢迎词，文风轻松幽默，记得在合适的位置提到第{index}位，不超过100字。'
         messages = [{'role': 'user', 'content': text},]
-        result = unillm(model_name_list, messages=messages, temperature=0.8)
+        result = unillm(self.model_name_list, messages=messages, temperature=0.8)
         return f'@{invitee} {result.strip()}'
 
     def difySearch(self, query, user):
@@ -370,11 +371,34 @@ class LLMTaskApi:
     def genArticleSum(self, url,):
         pass
     
+    def getGithubTrending(self,):
+        response = requests.get('https://github.com/trending?since=weekly', 
+                                proxies={"http": "http://127.0.0.1:8123", "https": "http://127.0.0.1:8123"})
+        text = '🔥本周GitHub热门项目🔥\n'
+        prefix = 'https://github.com'
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, 'html.parser')
+            repo_cards = soup.find_all('article', class_='Box-row')
+            for i, repo in enumerate(repo_cards[:5]):
+                name = repo.find('h2', class_='h3 lh-condensed').find('a')['href']
+                desc = repo.find('p', class_='col-9 color-fg-muted my-1 pr-4').text.strip()
+                lang = repo.find('span', class_='d-inline-block ml-0 mr-3').text.strip()
+                star_total = repo.find('a', class_='Link Link--muted d-inline-block mr-3').text.strip()
+                star_week = repo.find('span', class_='d-inline-block float-sm-right').text.strip().replace(' stars this week', '')
+                messages = [{'role': 'user', 'content': f'请用一句中文简述这个项目：{desc}'},]
+                res = unillm(self.model_name_list, messages=messages)
+                text += f'{i+1}. {prefix + name}\n - 项目简介：{res}\n - 语言：{lang}\n - 总Star: {star_total}\n - 周Star: {star_week}\n'
+        else:
+            text = '获取GitHub热门项目失败，请检查服务端日志'
+            logger.error(f'获取GitHub热门项目失败，状态码：{response.status_code}')
+        return text
+            
 class LLMResponseApi:
     def __init__(self):
         self.gaoDeApi = GaoDeApi()
         self.conversation_list = {}
         self.model_name_list = returnConfigData()['llmServer']['model_name_list']
+    
     def get_conversation_list(self, chatid):
         # 清除缓存
         start_time = (datetime.now() - timedelta(hours=0, minutes=10)).strftime("%Y%m%d%H%M%S")

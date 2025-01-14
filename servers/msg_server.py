@@ -109,10 +109,11 @@ class MsgHandler:
         logger.info(f'图片是否为广告图片: {answer}')
         if answer == '是':
             self.sendTextMsg(msg, '你小子是不是准备发广告？小心被群主发现！')
-            for admin in self.superAdmins:
-                nickname = self.getWxName(msg.sender)
-                roomname = self.getWxName(msg.roomid)
+            nickname = self.getWxName(msg.sender)
+            roomname = self.getWxName(msg.roomid)
+            for admin in self.superAdmins:    
                 msg.sender = admin
+                msg.roomid = admin
                 self.sendTextMsg(msg, f"{nickname}在{roomname}群发广告啦！")
 
 
