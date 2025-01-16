@@ -218,7 +218,7 @@ def generate_math_solution(image_path=None, text=''):
         logger.error(f'{response.status_code}, 解题请求失败')
         return ''
 
-def generate_article_summary(url):
+def generate_article(url):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
     }
@@ -227,17 +227,19 @@ def generate_article_summary(url):
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, 'html.parser')
         try:
-            title = soup.find('h1', attrs={'id': 'activity-name'}).get_text().strip()
+            # title = soup.find('h1', attrs={'id': 'activity-name'}).get_text().strip()
             content = soup.find('div', attrs={'id': 'js_content'}) # html文件
             content = content.get_text().strip()
             dateframe = re.findall(r'var ct\s*=\s*.*\d{10}', str(soup))
             date = re.split('"', dateframe[0]) 
             date = time.strftime("%Y-%m-%d",time.localtime(int(date[1])))
-            return f"{title}\n{content}\n{date}"
+            return {'content': content, 'date': date}
         except Exception as e:
-            return f'文章解析失败 {e}'
+            logger.error(f'文章解析失败 {e}')
+            return {}
     else:
-        return '文章获取失败'
+        logger.error(f'{response.status_code}, 文章获取失败')
+        return {}
 
 def test_vlm():
     model_name = 'gemini-1.5-flash'

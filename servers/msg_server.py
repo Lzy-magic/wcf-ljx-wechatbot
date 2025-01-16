@@ -269,6 +269,9 @@ class MsgHandler:
             urlOri = appmsg.find('webviewshared').find('shareUrlOriginal').text
             urlOpen = appmsg.find('webviewshared').find('shareUrlOpen').text
             response = f'公众号：{name}\n题目：{title}\n简介：{des}'
+            data = self.lta.genArticleSum(urlOpen)
+            if data:
+                response += f'\n摘要：{data["content"]}\n发布：{data["date"]}'
             self.sendTextMsg(msg, response)
         elif eType == '51': # 视频号消息
             finderFeed = root.find('.//finderFeed')

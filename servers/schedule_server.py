@@ -116,21 +116,26 @@ class ScheduleTaskServer:
     def pushBeikeReport(self):
         room_items = self.drs.showPushRoom(taskName='beikeReport')
         logger.info(f'准备推送给群: {room_items}')
-        for room_id, room_name in room_items:
-            contents = self.lta.getBeike()
-            for content in contents:
-                self.wcf.send_text(msg=content, receiver=room_id)
-            logger.info(f'房源信息推送给{room_name}成功')
-        
+        try:
+            for room_id, room_name in room_items:
+                contents = self.lta.getBeike()
+                for content in contents:
+                    self.wcf.send_text(msg=content, receiver=room_id)
+                logger.info(f'房源信息推送给{room_name}成功')
+        except Exception as e:
+            logger.error(f'房源信息推送失败: {e}')
     def pushGitHubReport(self):
         week_day = datetime.now().weekday()
         if week_day == 6:
             room_items = self.drs.showPushRoom(taskName='githubReport')
             logger.info(f'准备推送给群: {room_items}')
-            for room_id, room_name in room_items:
-                content = self.lta.getGithubTrending()
-                self.wcf.send_text(msg=content, receiver=room_id)
-                logger.info(f'GitHub热榜推送给{room_name}成功')
+            try:
+                for room_id, room_name in room_items:
+                    content = self.lta.getGithubTrending()
+                    self.wcf.send_text(msg=content, receiver=room_id)
+                    logger.info(f'GitHub热榜推送给{room_name}成功')
+            except Exception as e:
+                logger.error(f'GitHub热榜推送失败: {e}')
 
     def clearCache(self):
         clearCacheFolder()
