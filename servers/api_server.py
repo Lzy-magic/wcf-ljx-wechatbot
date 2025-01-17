@@ -180,7 +180,7 @@ class BeikeApi:
                 houses = response.json()
                 if len(houses) > 0:
                     for i, house in enumerate(houses):
-                        text += f"{i+1}. {house['house_id']} {house['biz_circle']} {house['community_name']} {int(house['square'])}平 {int(house['price_total'])}万\n"
+                        text += f"{i+1}. {house['house_id']} {house['biz_circle']} {house['community_name']} {int(house['square'])}平 {int(house['total_price'])}万\n"
                 else:
                     text += '暂无数据'
                 texts.append(text)
@@ -218,7 +218,7 @@ class BeikeApi:
                 data_dict[community_name] = [0, 0, 0]
             data_dict[community_name][0] += 1
             data_dict[community_name][1] += int(house['square'])
-            data_dict[community_name][2] += int(house['price_total']) if not isDeal else int(house['total_price'])
+            data_dict[community_name][2] += int(house['total_price']) if not isDeal else int(house['total_price'])
         items = sorted(data_dict.items(), key=lambda x: x[1][0], reverse=True)
         return items
 

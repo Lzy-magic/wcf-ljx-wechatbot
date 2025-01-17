@@ -1,10 +1,20 @@
 import time
 import schedule
+import functools
 from datetime import datetime
 from lunarcalendar import Converter, Solar, Lunar
 from utils.common import logger, returnConfigData, clearCacheFolder
 from servers.api_server import ApiServer, LLMTaskApi
 from servers.db_server import DbRoomServer
+
+def exception_handler(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            logger.error(f'{func.__name__}异常: {e}')
+    return wrapper
 
 # 阳历转换为阴历
 def solar_to_lunar(date):
@@ -30,6 +40,7 @@ class ScheduleTaskServer:
         self.lta = LLMTaskApi()
         self.drs = DbRoomServer()
 
+    @exception_handler
     def pushMorningPage(self):
         page = self.ams.getMoringPage()
         if not page:
@@ -41,6 +52,7 @@ class ScheduleTaskServer:
             self.wcf.send_image(path=page, receiver=room_id) # 传本地文件
             logger.info(f'早安页面推送给{room_name}成功')
     
+    @exception_handler
     def pushFish(self):
         page = self.ams.getFishImg()
         if not page:
@@ -52,6 +64,7 @@ class ScheduleTaskServer:
             self.wcf.send_image(path=page, receiver=room_id) # 传本地文件
             logger.info(f'摸鱼图片推送给{room_name}成功')
     
+    @exception_handler
     def pushAiNews(self):
         text = self.ams.getAiNews()
         if not text:
@@ -63,6 +76,7 @@ class ScheduleTaskServer:
             self.wcf.send_text(msg=text, receiver=room_id) # 传本地文件
             logger.info(f'AI新闻页面推送给{room_name}成功')
     
+    @exception_handler
     def pushGoodNight(self):
         text = self.lta.getGoodNight()
         if not text:
@@ -74,6 +88,7 @@ class ScheduleTaskServer:
             self.wcf.send_text(msg=text, receiver=room_id)
             logger.info(f'晚安页面推送给{room_name}成功')
     
+    @exception_handler
     def pushFestivalWish(self):
         festival_dict = returnConfigData()['scheduleConfig']['festival']
         today = str(datetime.now().date())
@@ -88,6 +103,7 @@ class ScheduleTaskServer:
                         self.wcf.send_text(msg=content, receiver=room_id)
                         logger.info(f'节日祝福推送给{room_name}成功: {festival} {date}')
 
+    @exception_handler
     def pushBirthdayWish(self):
         birthday_dict = returnConfigData()['scheduleConfig']['birthday']
         today = str(datetime.now().date())
@@ -103,6 +119,7 @@ class ScheduleTaskServer:
                         self.wcf.send_text(msg=content, receiver=room_id)
                         logger.info(f'生日祝福推送给{room_name}成功: {name} {birthday}')
     
+    @exception_handler
     def pushWeatherReport(self):
         weather_list = returnConfigData()['scheduleConfig']['weather_district']
         room_items = self.drs.showPushRoom(taskName='weatherReport')
@@ -113,17 +130,17 @@ class ScheduleTaskServer:
                 self.wcf.send_text(msg=content, receiver=room_id)
                 logger.info(f'天气预报推送给{room_name}成功: {district}')
     
+    @exception_handler
     def pushBeikeReport(self):
         room_items = self.drs.showPushRoom(taskName='beikeReport')
         logger.info(f'准备推送给群: {room_items}')
-        try:
-            for room_id, room_name in room_items:
-                contents = self.lta.getBeike()
-                for content in contents:
-                    self.wcf.send_text(msg=content, receiver=room_id)
-                logger.info(f'房源信息推送给{room_name}成功')
-        except Exception as e:
-            logger.error(f'房源信息推送失败: {e}')
+        for room_id, room_name in room_items:
+            contents = self.lta.getBeike()
+            for content in contents:
+                self.wcf.send_text(msg=content, receiver=room_id)
+            logger.info(f'房源信息推送给{room_name}成功')
+
+    @exception_handler
     def pushGitHubReport(self):
         week_day = datetime.now().weekday()
         if week_day == 6:
@@ -137,6 +154,7 @@ class ScheduleTaskServer:
             except Exception as e:
                 logger.error(f'GitHub热榜推送失败: {e}')
 
+    @exception_handler
     def clearCache(self):
         clearCacheFolder()
         logger.info('缓存清理成功')
