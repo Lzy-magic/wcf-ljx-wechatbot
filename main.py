@@ -4,7 +4,7 @@ from threading import Thread
 
 from utils.common import logger, initCacheFolder
 from servers.db_server import DbInitServer
-from servers.msg_server import SingleMsgHandler, RoomMsgHandler
+from servers.msg_server import SingleMsgHandler, RoomMsgHandler, GhMsgHandler
 from servers.schedule_server import ScheduleTaskServer
 
 class MainServer:
@@ -14,6 +14,7 @@ class MainServer:
         self.initDateBase()
         self.rmh = RoomMsgHandler(self.wcf)
         self.smh = SingleMsgHandler(self.wcf)
+        self.gmh = GhMsgHandler(self.wcf)
         self.sts = ScheduleTaskServer(self.wcf)
         Thread(target=self.sts.run, name='定时推送服务').start()
         
@@ -52,8 +53,12 @@ class MainServer:
                 # 私聊消息处理
                 elif '@chatroom' not in msg.roomid and 'gh_' not in msg.sender:
                     Thread(target=self.smh.mainHandle, args=(msg,)).start()
+                # 公众号消息处理
+                elif msg.sender.startswith('gh_'):
+                    Thread(target=self.gmh.mainHandle, args=(msg,)).start()
                 else:
                     pass
+
             except Empty:
                 continue
 

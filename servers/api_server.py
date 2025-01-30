@@ -4,7 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 from utils.common import logger, returnConfigData, downloadFile, encode_image
-from utils.prompt import sys_base_prompt, sys_birthday_wish, sys_weather_report, sys_intention_rec, sys_route_plan, sys_poi_rec, sys_poi_ext, sys_video_gen
+from utils.prompt import sys_base_prompt, sys_birthday_wish, sys_weather_report, sys_intention_rec, sys_route_plan, sys_poi_rec, sys_poi_ext, sys_video_gen, sys_room_summary
 from utils.llm import UniLLM, generate_video_sf, generate_article
 
 unillm = UniLLM()
@@ -380,8 +380,7 @@ class LLMTaskApi:
         return data
 
     def getGithubTrending(self,):
-        response = requests.get('https://github.com/trending?since=weekly', 
-                                proxies={"http": "http://127.0.0.1:8123", "https": "http://127.0.0.1:8123"})
+        response = requests.get('https://github.com/trending?since=weekly')
         text = '🔥本周GitHub热门项目🔥\n'
         prefix = 'https://github.com'
         if response.status_code == 200:
@@ -390,7 +389,10 @@ class LLMTaskApi:
             for i, repo in enumerate(repo_cards[:5]):
                 name = repo.find('h2', class_='h3 lh-condensed').find('a')['href']
                 desc = repo.find('p', class_='col-9 color-fg-muted my-1 pr-4').text.strip()
-                lang = repo.find('span', class_='d-inline-block ml-0 mr-3').text.strip()
+                try:
+                    lang = repo.find('span', class_='d-inline-block ml-0 mr-3').text.strip()
+                except:
+                    lang = 'Unknown'
                 star_total = repo.find('a', class_='Link Link--muted d-inline-block mr-3').text.strip()
                 star_week = repo.find('span', class_='d-inline-block float-sm-right').text.strip().replace(' stars this week', '')
                 messages = [{'role': 'user', 'content': f'请用一句中文简述这个项目：{desc}'},]
@@ -400,6 +402,14 @@ class LLMTaskApi:
             text = '获取GitHub热门项目失败，请检查服务端日志'
             logger.error(f'获取GitHub热门项目失败，状态码：{response.status_code}')
         return text
+
+    def getRoomMessSummary(self, contents):
+        messages = [
+            {'role': 'system', 'content': sys_room_summary},
+            {'role': 'user', 'content': contents},
+        ]
+        result = unillm(self.model_name_list, messages=messages)
+        return result
             
 class LLMResponseApi:
     def __init__(self):

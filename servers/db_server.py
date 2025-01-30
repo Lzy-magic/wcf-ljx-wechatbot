@@ -1,10 +1,12 @@
 import os
 import sqlite3
+from datetime import datetime
 from utils.common import logger
 
 current_path = os.path.dirname(__file__)
 userDb = current_path + '/../data/user.db'
 roomDb = current_path + '/../data/room.db'
+messageDb = current_path + '/../data/message.db'
 
 def openDb(dbPath, ):
     conn = sqlite3.connect(database=dbPath, )
@@ -36,15 +38,19 @@ class DbInitServer:
 
     def initDb(self, ):
         # 初始化用户数据库 用户表 管理员表
-        userConn, userCursor = openDb(userDb)
-        self.createTable(userCursor, 'whiteUser', 'wxId varchar(255) PRIMARY KEY, wxName varchar(255)')
-        self.createTable(userCursor, 'Admin', 'wxId varchar(255) PRIMARY KEY, roomId varchar(255)')
-        closeDb(userConn, userCursor)
+        conn, cursor = openDb(userDb)
+        self.createTable(cursor, 'whiteUser', 'wxId varchar(255) PRIMARY KEY, wxName varchar(255)')
+        self.createTable(cursor, 'Admin', 'wxId varchar(255) PRIMARY KEY, roomId varchar(255)')
+        closeDb(conn, cursor)
         # 初始化群聊数据库 白名单表 推送定时任务表
-        userConn, userCursor = openDb(roomDb)
-        self.createTable(userCursor, 'whiteRoom', 'roomId varchar(255) PRIMARY KEY, roomName varchar(255)')
-        self.createTable(userCursor, 'pushRoom', 'taskName varchar(255), roomId varchar(255), roomName varchar(255), PRIMARY KEY (taskName, roomId)')
-        closeDb(userConn, userCursor)
+        conn, cursor = openDb(roomDb)
+        self.createTable(cursor, 'whiteRoom', 'roomId varchar(255) PRIMARY KEY, roomName varchar(255)')
+        self.createTable(cursor, 'pushRoom', 'taskName varchar(255), roomId varchar(255), roomName varchar(255), PRIMARY KEY (taskName, roomId)')
+        closeDb(conn, cursor)
+        # 初始化消息数据库 消息表 群聊消息表
+        conn, cursor = openDb(messageDb)
+        self.createTable(cursor,'chatMessage', 'id INTEGER PRIMARY KEY AUTOINCREMENT, wxId varchar(255), wxName varchar(255), roomId varchar(255), content varchar(255), createTime datetime DEFAULT CURRENT_TIMESTAMP')
+        closeDb(conn, cursor)
         logger.info(f'数据库初始化成功！！！')
 
 class DbUserServer:
@@ -237,6 +243,34 @@ class DbRoomServer:
             return result
         except Exception as e:
             logger.error(f'查看推送任务出现错误: {e}')
+            closeDb(conn, cursor)
+            return []
+
+class DbMsgServer:
+    def __init__(self):
+        pass
+    def addChatMessage(self, wxId, wxName, roomId, content):
+        conn, cursor = openDb(messageDb)
+        try:
+            today = datetime.now().strftime('%Y-%m-%d')
+            cursor.execute('INSERT INTO chatMessage (wxId, wxName, roomId, content) VALUES (?, ?, ?, ?)', (wxId, wxName, roomId, content))
+            conn.commit()
+            closeDb(conn, cursor)
+            return True
+        except Exception as e:
+            logger.error(f'新增群聊消息出现错误: {e}')
+            closeDb(conn, cursor)
+            return False
+    
+    def showChatMessage(self, roomId):
+        conn, cursor = openDb(messageDb)
+        try:
+            cursor.execute('SELECT wxName, content, createTime FROM chatMessage WHERE roomId=? AND DATE(createTime)=?', (roomId, datetime.now().strftime('%Y-%m-%d')))
+            result = cursor.fetchall()
+            closeDb(conn, cursor)
+            return result
+        except Exception as e:
+            logger.error(f'查看群聊消息出现错误: {e}')
             closeDb(conn, cursor)
             return []
 

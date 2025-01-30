@@ -5,7 +5,7 @@ from datetime import datetime
 from lunarcalendar import Converter, Solar, Lunar
 from utils.common import logger, returnConfigData, clearCacheFolder
 from servers.api_server import ApiServer, LLMTaskApi
-from servers.db_server import DbRoomServer
+from servers.db_server import DbRoomServer, DbMsgServer
 
 def exception_handler(func):
     @functools.wraps(func)
@@ -39,6 +39,7 @@ class ScheduleTaskServer:
         self.ams = ApiServer()
         self.lta = LLMTaskApi()
         self.drs = DbRoomServer()
+        self.dms = DbMsgServer()
 
     @exception_handler
     def pushMorningPage(self):
@@ -155,6 +156,26 @@ class ScheduleTaskServer:
                 logger.error(f'GitHub热榜推送失败: {e}')
 
     @exception_handler
+    def roomSummary(self):
+        room_items = self.drs.showPushRoom(taskName='roomSummary')
+        logger.info(f'群列表: {room_items}')
+        logger.info(f'推送群总结: {[room_name for room_id, room_name in room_items]}')
+        try:
+            for room_id, room_name in room_items:
+                chats = self.dms.showChatMessage(room_id)
+                contents = '\n'.join([f'{chat[2]} {chat[0]}: {chat[1]}' for chat in chats])
+                if not contents:
+                    contents = '无聊天记录'
+                content = self.lta.getRoomMessSummary(contents)
+                if content:
+                    self.wcf.send_text(msg=content, receiver=room_id)
+                    logger.info(f'群{room_name}总结推送成功')
+                else:
+                    logger.info(f'群{room_name}总结推送失败')
+        except Exception as e:
+            logger.error(f'群总结推送失败: {e}')
+    
+    @exception_handler
     def clearCache(self):
         clearCacheFolder()
         logger.info('缓存清理成功')
@@ -170,6 +191,7 @@ class ScheduleTaskServer:
         schedule.every().day.at(configData['weatherReportTime']).do(self.pushWeatherReport)
         schedule.every().day.at(configData['beikeReportTime']).do(self.pushBeikeReport)
         schedule.every().day.at(configData['githubReportTime']).do(self.pushGitHubReport)
+        schedule.every().day.at(configData['roomSummaryTime']).do(self.roomSummary)
         schedule.every().day.at(configData['clearCacheTime']).do(self.clearCache)
         while True:
             schedule.run_pending()

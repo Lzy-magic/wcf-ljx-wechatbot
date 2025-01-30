@@ -18,6 +18,8 @@ scheduleConfig:
    生日提醒: 'birthday'
    天气推送: 'weatherReport'
    GitHub推送: 'githubReport'
+   群聊总结: 'roomSummary'
+
   # 早报推送时间
   morningPageTime: '10:20'
   # 摸鱼日记推送时间设置
@@ -34,6 +36,8 @@ scheduleConfig:
   weatherReportTime: '06:30'
   # Github推送时间
   githubReportTime: '21:00'
+  # 群聊总结时间
+  roomSummaryTime: '23:59'
   # 清除缓存时间
   clearCacheTime: '03:00'
   festival:

@@ -6,15 +6,17 @@ from datetime import datetime
 import xml.etree.ElementTree as ET
 from utils.common import logger, returnConfigData, returnPicCacheFolder
 from utils.prompt import intentions_list, welcome_msg
-from servers.db_server import DbRoomServer, DbUserServer
+from servers.db_server import DbRoomServer, DbUserServer, DbMsgServer
 from servers.api_server import LLMTaskApi, ApiServer, LLMResponseApi
 
 class MsgHandler:
     def __init__(self, wcf):
         self.wcf = wcf
         self.wxid = wcf.get_self_wxid()
+        self.wxname = wcf.get_user_info().get('name')
         self.dus = DbUserServer()
         self.drs = DbRoomServer()
+        self.dms = DbMsgServer()
         self.lta = LLMTaskApi()
         self.lra = LLMResponseApi()
         self.aps = ApiServer()
@@ -116,7 +118,6 @@ class MsgHandler:
                 msg.roomid = admin
                 self.sendTextMsg(msg, f"{nickname}在{roomname}群发广告啦！")
 
-
     def triggerFunction(self, msg, triggerType, triggerWords, chatid):
         content = msg.content.strip()
         if not any(content.startswith(t) for t in triggerWords):
@@ -126,6 +127,8 @@ class MsgHandler:
             response = self.aps.get_yuanqi(content)
             self.sendTextMsg(msg, response)
             self.lra.updateMessage(chatid, [msg.content, response])
+            # 保存消息到数据库
+            self.addChatMsg(self.wxid, self.bot_name, chatid, response)
         elif triggerType == 'difySearch':
             # 调用dify搜索智能体进行回复
             pre_text = f'{self.bot_name}正在调用搜索引擎为您服务，请耐心等待哦，预计20-60s'
@@ -133,6 +136,7 @@ class MsgHandler:
             response = self.lta.difySearch(content, user=self.bot_name)
             self.sendTextMsg(msg, response)
             self.lra.updateMessage(chatid, [msg.content, response])
+            self.addChatMsg(self.wxid, self.bot_name, chatid, response)
         elif triggerType == 'beikeRetrive':
             match = re.search(r'\d+', content)
             if content.startswith('挂牌'):
@@ -234,6 +238,9 @@ class MsgHandler:
                 response = "你是需要我帮你理解图片么，请先发送一张图片哦，我会基于你的最近一张图片进行回答"
             self.sendTextMsg(msg, response)
             self.lra.updateMessage(chatid, [msg.content, response])
+        
+        # 保存消息到数据库
+        self.addChatMsg(self.wxid, self.bot_name, chatid, response)
 
     def parseMsg(self, msg):
         """
@@ -255,6 +262,7 @@ class MsgHandler:
                 content = curText + f'\n引用{oriName}的消息：{oriContent}'
                 msg.content = content
                 logger.info(f'处理后的消息: {content}')
+                self.addChatMsg(msg.sender, self.getWxName(msg.sender), msg.roomid, msg.content)
             else:
                 # TODO: 处理图片、视频、语音等消息
                 msg.content = curText
@@ -283,6 +291,9 @@ class MsgHandler:
             logger.info(f'收到其他类型消息: {eType}')
             response = f'收到{eType}消息，暂不支持处理，请联系群主安排开发'
             self.sendTextMsg(msg, response)
+
+    def addChatMsg(self, wxId, wxName, roomId, content):
+        self.dms.addChatMessage(wxId, wxName, roomId, content)
 
 class SingleMsgHandler(MsgHandler):
     def __init__(self, wcf):
@@ -391,7 +402,7 @@ class SingleMsgHandler(MsgHandler):
             return 
 
         # 判断是否有私聊权限
-        if not self.dus.searchUser(sender):
+        if not (self.dus.searchUser(sender) or self.judgeSuperAdmin(sender)):
             return
         
         # 开始处理消息
@@ -521,6 +532,8 @@ class RoomMsgHandler(MsgHandler):
             self.joinRoomWelcome(msg)
         
         # 开始处理消息
+        if msg.type == 1: # 文本消息
+            self.addChatMsg(sender, self.getWxName(sender), roomId, msg.content)
         if msg.type == 1 and msg.is_at(self.wxid): # 文本消息
             msg.content = re.sub(r"@.*?[\u2005|\s]", "", msg.content) # 删除 content 字符串中以 @ 开头，后跟任意字符，直到遇到中文空格或普通空白字符的部分
             logger.info(f'收到群消息: {msg.content}')
@@ -530,4 +543,22 @@ class RoomMsgHandler(MsgHandler):
         elif msg.type == 49: # 引用消息 公众号/视频号消息
             self.parseMsg(msg)
         
+class GhMsgHandler(MsgHandler):
+    def __init__(self, wcf):
+        super().__init__(wcf)
+    
+    def mainHandle(self, msg):
+        if msg.type != 49:
+            return
+        gh_id  = msg.sender
+        gh_name = self.getWxName(gh_id)
+        root = ET.fromstring(msg.content)
+        appmsg = root.find('appmsg')
+        title = appmsg.find('title').text
+        url = appmsg.find('url').text
         
+        info = f"公众号：{gh_name}\n标题：{title}\n链接：{url}\n时间：{datetime.now().strftime('%Y-%m-%d %H:%M')}"
+        for admin in self.superAdmins:
+            msg.sender = admin
+            self.sendTextMsg(msg, info)
+            # self.wcf.forward_msg(msg.id, admin)
