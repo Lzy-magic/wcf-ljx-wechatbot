@@ -186,47 +186,7 @@ class MsgHandler:
             response = self.lra.weatherResponse(msg.content, self.bot_name)
             self.sendTextMsg(msg, response)
             self.lra.updateMessage(chatid, [msg.content, response])
-        # 2.2 路径规划
-        elif intention in ['步行规划', '骑行规划', '驾车规划', '公交规划']:
-            response = self.lra.pathResponse(msg.content, intention, self.bot_name)
-            self.sendTextMsg(msg, response)
-            self.lra.updateMessage(chatid, [msg.content, response])
-        # 2.3 地点推荐
-        elif intention == '地点推荐':
-            response = self.lra.poiRecResponse(msg.content, self.bot_name)
-            self.sendTextMsg(msg, response)
-            self.lra.updateMessage(chatid, [msg.content, response])
-        # 2.4 图片生成
-        elif intention == '图片生成':
-            notification_text = f'收到，{self.bot_name}正在抓紧出图，预计5-20s...'
-            self.sendTextMsg(msg, notification_text)
-            conversion_id = self.getOrUpdateDifyImgConId(chatid)
-            image_path, conversion_id = self.lta.difyImage(query=msg.content, user=chatid, conversation_id=conversion_id)
-            if image_path:
-                self.getOrUpdateDifyImgConId(chatid, conversion_id) # 缓存对话id
-                self.sendFileMsg(msg, image_path)
-                response = '图片生成成功！'
-                self.sendTextMsg(msg, response)
-            else:
-                response = '图片生成失败，请稍后再试'
-                self.sendTextMsg(msg, response)
-            self.lra.updateMessage(chatid, [msg.content, response])
-        # 2.5 视频生成
-        elif intention == '视频生成':
-            notification_text = f'收到，{self.bot_name}正在抓紧生成视频，请耐心等待，预计30-60s...'
-            self.sendTextMsg(msg, notification_text)
-            # 生成视频提示词
-            res_prompt = self.lra.vidPromptResponse(msg.content)
-            vid_path = self.lta.genVid(res_prompt)
-            if vid_path:
-                self.sendFileMsg(msg, vid_path)
-                response = f'搞定!\n为您润色的提示词：\n{res_prompt}\n供参考！'
-                self.sendTextMsg(msg, response)
-            else:
-                response = '视频生成失败，请稍后再试'
-                self.sendTextMsg(msg, response)
-            self.lra.updateMessage(chatid, [msg.content, response])
-        # 2.6 图片理解
+        # 2.2 图片理解
         elif intention in ['数学解题', '图片理解']:
             picPath = returnPicCacheFolder()
             prefix = f'{msg.sender}_{msg.roomid}_'
@@ -238,7 +198,10 @@ class MsgHandler:
                 response = "你是需要我帮你理解图片么，请先发送一张图片哦，我会基于你的最近一张图片进行回答"
             self.sendTextMsg(msg, response)
             self.lra.updateMessage(chatid, [msg.content, response])
-        
+        # 2.3 龙王统计
+        elif intention in ['龙王', '群排行']:
+           #TODO 龙王统计
+
         # 保存消息到数据库
         self.addChatMsg(self.wxid, self.bot_name, chatid, response)
 
@@ -287,10 +250,16 @@ class MsgHandler:
             objectNonceId = finderFeed.find('./objectNonceId').text
             response = self.aps.getWxVideo(objectId, objectNonceId)
             self.sendTextMsg(msg, response)
+        elif eType == '33': # 小程序消息
+            logger.info(f'收到其他类型消息: {eType}')
+            # content = curText + f'\n引用{oriName}的消息：{oriContent}'
+            # msg.content = content
+            # logger.info(f'处理后的消息: {content}')
+            # self.addChatMsg(msg.sender, self.getWxName(msg.sender), msg.roomid, msg.content)
         else:
             logger.info(f'收到其他类型消息: {eType}')
-            response = f'收到{eType}消息，暂不支持处理，请联系群主安排开发'
-            self.sendTextMsg(msg, response)
+            #response = f'收到{eType}消息，暂不支持处理，请联系群主安排开发'
+           # self.sendTextMsg(msg, response)
 
     def addChatMsg(self, wxId, wxName, roomId, content):
         self.dms.addChatMessage(wxId, wxName, roomId, content)
@@ -512,7 +481,7 @@ class RoomMsgHandler(MsgHandler):
             wx_names = [wx_names]
         for wx_name in wx_names:
             roomMember = self.wcf.get_chatroom_members(msg.roomid)
-            text = self.lta.roomWelcome(room_name=self.getWxName(msg.roomid), invitee=wx_name, index=len(roomMember)+1)
+            text = self.lta.roomWelcome(room_name=self.getWxName(msg.roomid), invitee=wx_name, index=len(roomMember))
             self.wcf.send_text(msg=text, receiver=msg.roomid)
             
     def mainHandle(self, msg):

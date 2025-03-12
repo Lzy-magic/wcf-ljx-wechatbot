@@ -9,26 +9,13 @@
 
 **一个基于 [WeChatFerry](https://github.com/lich0821/WeChatFerry) 的微信机器人。**
 
-**支持自动拉人，自动群发，入群欢迎，AI回复，关键词回复，定时任务等功能！如果有更多需求，欢迎进群交流！**
+**支持自动拉人，自动群发，入群欢迎，AI回复，关键词回复，定时任务等功能！！**
 
 **注意⚠️：此项目仅供学习交流使用，请勿做违法犯罪行为，否则后果自负！！！**
-
-**作者：猴哥AI**
-
-**公众号：猴哥的AI知识库**
-
-**如果你觉得此项目不错，可以给个Star，或者关注一下公众号**
-
-
-| ![Image 1](./assets/gzh_code.jpg) | ![Image 2](./assets/star_code.jpg) |
-|:-:|:-:|
-| 后台回复 `加群` 进群交流 | 如果你觉得有用 |
 
 ### 1.1、新手入门
 
 1. [一款微信AI机器人开发框架！稳定可靠，小白友好](https://mp.weixin.qq.com/s/Dq7zw54Dd0p1WgaPKLGanA)
-
-2. [借 WeChatFerry 东风，我把微信机器人复活了！](https://mp.weixin.qq.com/s/sNet-pHVGWMPL9dPNQ9Aag)
 
 ## 📖 2、项目结构
 
@@ -96,6 +83,9 @@ python main.py
 
 ![](./assets/login.webp)
 
+### ferry bug
+1.需要取消勾选控制台中的“快速编辑模式”，不然会出现消息卡住必须敲回车才能响应的bug，此处
+2.需要保证首选语言为简体中文
 
 ### 3.2、配置文件
 
@@ -133,23 +123,10 @@ scheduleConfig:
 设置不同关键词，进行自动拉群。
 ```
 roomKeyWord:
-  加群:  58060988515@chatroom 
+  加群:  xxx@chatroom 
 ```
 
-
-#### 3.2.4、API接口服务配置
-
-用于定义各种接口对应的 Key 和 URL，需前往对应官网进行申请。
-
-比如，要获取天气、定理位置等信息，可采用高德地图提供的接口信息，有需要的朋友可参考教程：[高德 API 接入](https://zhuanlan.zhihu.com/p/717945448)
-
-```
-apiServer:
-  # 高德 Key
-  gaoDeKey: 'xxx'
-```
-
-#### 3.2.5、LLM 接口服务配置
+#### 3.2.4、LLM 接口服务配置
 
 本项目用到的 LLM 主要采用 OneAPI 统一管理，可参考教程：[OneAPI-接口管理和分发神器：所有大模型一键封装成OpenAI协议](https://zhuanlan.zhihu.com/p/707769192) 。
 
@@ -223,7 +200,7 @@ llmServer:
 ```
 2、机器配置多少才够
 
-- 亲测 2c4g 就能跑，4c8g 完全没问题。
+- 亲测 1c2g 就能跑。
 ```
 
 
@@ -234,4 +211,18 @@ llmServer:
 
 - https://github.com/ngc660sec/NGCBot
 
-感谢 NGCBot 库！！！参考了其中的很多代码！
+- 
+
+## Planned Features
+
+<div align="left">🛠 Building</div>
+<div align="left">🔄 Planned</div>
+
+| **Feature**                     | **Description**                                                                            | **Priority** |
+| ------------------------------- | ------------------------------------------------------------------------------------------ | ------------ |
+| **7天未说话统计 **               | 统计7天没有说话的群员                                                                        | 🛠            |
+| **群聊天实时统计**              | 随时@机器人以统计群聊天次数排行，并去重                                                        | 🛠           |
+| **去掉冗余功能**                |                                                                                            | 🛠            |
+| **llm model配置化**             |                                                                                            | 🔄           |
+| **更换免费硅基流动api**          |                                                                                            | 🔄           |
+| **根据不同群号配置不同的config 和 prompt** |                                                                                  | 🔄           |
