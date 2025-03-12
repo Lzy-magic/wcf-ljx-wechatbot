@@ -265,6 +265,7 @@ class DbMsgServer:
     def showChatMessage(self, roomId):
         conn, cursor = openDb(messageDb)
         try:
+            #TODO != robot and format create time, token limit input 128k
             cursor.execute('SELECT wxName, content, createTime FROM chatMessage WHERE roomId=? AND DATE(createTime)=?', (roomId, datetime.now().strftime('%Y-%m-%d')))
             result = cursor.fetchall()
             closeDb(conn, cursor)

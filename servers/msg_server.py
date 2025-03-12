@@ -199,8 +199,8 @@ class MsgHandler:
             self.sendTextMsg(msg, response)
             self.lra.updateMessage(chatid, [msg.content, response])
         # 2.3 龙王统计
-        elif intention in ['龙王', '群排行']:
-           #TODO 龙王统计
+        #elif intention in ['龙王', '群排行']:
+            #TODO 龙王统计
 
         # 保存消息到数据库
         self.addChatMsg(self.wxid, self.bot_name, chatid, response)
@@ -319,7 +319,7 @@ class SingleMsgHandler(MsgHandler):
             status = True
             wxId = content.replace(addWhiteWord, '').strip()
             if wxId.endswith('@chatroom'):
-                if self.drs.delWhiteRoom(wxId, self.getWxName(wxId)):
+                if self.drs.delWhiteRoom(wxId):
                     self.sendTextMsg(msg, f'{wxId} 已删除群聊权限')
                     # self.whiteRooms.remove(wxId)
                 else:
@@ -330,6 +330,41 @@ class SingleMsgHandler(MsgHandler):
                     # self.whiteUsers.remove(wxId)
                 else:
                     self.sendTextMsg(msg, f'{wxId} 删除私聊权限失败')
+        # 添加推送群
+        addPushWord = self.adminFunctionWord['addPushWord']
+        if content.startswith(addPushWord):
+            status = True
+            wxId = content.replace(addPushWord, '').strip()
+            if wxId.endswith('@chatroom'):
+                if self.drs.addPushRoom(wxId, self.getWxName(wxId)):
+                    self.sendTextMsg(msg, f'{wxId} 已添加推送群')
+                    # self.whiteRooms.add(wxId)
+                else:
+                    self.sendTextMsg(msg, f'{wxId} 添加推送群失败')
+            else:
+                if self.dus.addUser(wxId, self.getWxName(wxId)):
+                    self.sendTextMsg(msg, f'{wxId} 已添加推送群')
+                    # self.whiteUsers.add(wxId)
+                else:
+                    self.sendTextMsg(msg, f'{wxId} 添加推送群失败')
+        # 删除推送群
+        delPushWord = self.adminFunctionWord['delPushWord']
+        if content.startswith(delPushWord):
+            status = True
+            wxId = content.replace(delPushWord, '').strip()
+            if wxId.endswith('@chatroom'):
+                if self.drs.delPushRoom(wxId):
+                    self.sendTextMsg(msg, f'{wxId} 已删除推送群')
+                    # self.whiteRooms.add(wxId)
+                else:
+                    self.sendTextMsg(msg, f'{wxId} 删除推送群失败')
+            else:
+                if self.dus.delUser(wxId, self.getWxName(wxId)):
+                    self.sendTextMsg(msg, f'{wxId} 已删除推送群')
+                    # self.whiteUsers.add(wxId)
+                else:
+                    self.sendTextMsg(msg, f'{wxId} 删除推送群失败')
+        
         return status
     
     def joinRoom(self, msg):
