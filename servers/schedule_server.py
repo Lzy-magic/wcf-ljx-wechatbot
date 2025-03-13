@@ -163,6 +163,7 @@ class ScheduleTaskServer:
         try:
             for room_id, room_name in room_items:
                 chats = self.dms.showChatMessage(room_id)
+                #TODO get 排行榜 use group and count
                 contents = '\n'.join([f'{chat[2]} {chat[0]}: {chat[1]}' for chat in chats])
                 if not contents:
                     contents = '无聊天记录'
@@ -189,7 +190,7 @@ class ScheduleTaskServer:
         schedule.every().day.at(configData['festivalTime']).do(self.pushFestivalWish)
         schedule.every().day.at(configData['birthdayTime']).do(self.pushBirthdayWish)
         schedule.every().day.at(configData['weatherReportTime']).do(self.pushWeatherReport)
-        schedule.every().day.at(configData['beikeReportTime']).do(self.pushBeikeReport)
+        #schedule.every().day.at(configData['beikeReportTime']).do(self.pushBeikeReport)
         schedule.every().day.at(configData['githubReportTime']).do(self.pushGitHubReport)
         schedule.every().day.at(configData['roomSummaryTime']).do(self.roomSummary)
         schedule.every().day.at(configData['clearCacheTime']).do(self.clearCache)

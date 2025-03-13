@@ -74,6 +74,10 @@ adminFunctionWord:
   addWhiteWord: '加白'
   # 删除私聊/群聊白名单
   delWhiteWord: '删白'
+  # 新增推送群
+  addPushWord: '加推送'
+  # 删除推送群
+  delPushWord: '删推送'
   # 新增管理员关键词
   addAdminWord:
     - '添加管理员'
@@ -117,7 +121,7 @@ llmServer:
   oa_api_key: ''
   oa_base_url: 'http://xxx:4000/v1'
   model_name_list:
-   - 'gemini-1.5-flash'
+   - 'glm-4-9b-chat'
    - 'glm4-flash'
    - 'glm4-9b'
    - 'internlm'
