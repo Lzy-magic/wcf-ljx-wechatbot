@@ -280,7 +280,7 @@ class DbMsgServer:
         try:
             cursor.execute(
                 "select wxName, count(*) as count from chatMessage where chatMessage.roomId = ? and strftime('%Y-%m-%d', createTime) = strftime('%Y-%m-%d', DATE('now', '-1 day')) group by wxId order by count desc",
-                (roomId))
+                (roomId,))
             result = cursor.fetchall()
             closeDb(conn, cursor)
             return result
@@ -294,7 +294,7 @@ class DbMsgServer:
         try:
             cursor.execute(
                 "select wxid, wxname from chatMessage where strftime('%Y-%m-%d', createTime) > strftime('%Y-%m-%d', DATE('now', '-7 day')) AND roomId = ? GROUP BY wxId",
-                (roomId))
+                (roomId,))
             result = cursor.fetchall()
             closeDb(conn, cursor)
             return result

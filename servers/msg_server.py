@@ -375,7 +375,7 @@ class SingleMsgHandler(MsgHandler):
                 # 对交集取反
                 difference = set(roomMemberIds) - intersection
                 content = '\n'.join([f'{item}' for item in difference])
-                if list:
+                if content:
                     self.sendTextMsg(msg, f'7天未说话列表如下{content}')
                 else:
                     self.sendTextMsg(msg, f'7天未说话列表为空')
