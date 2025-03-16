@@ -368,7 +368,7 @@ class SingleMsgHandler(MsgHandler):
             status = True
             wxId = content.replace(UnTalkMembers, '').strip()
             if wxId.endswith('@chatroom'):
-                list = self.drs.showLastWeekTalkMembers(wxId)
+                list = self.dms.showLastWeekTalkMembers(wxId)
                 roomMemberIds = self.wcf.get_chatroom_members(wxId).keys()
                 # 找到交集
                 intersection = set(list) & set(roomMemberIds)
