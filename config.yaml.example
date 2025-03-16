@@ -4,7 +4,7 @@ Administrators:
 
 ## 系统配置
 systemConfig:
-  robotName: '小爱'
+  robotName: '小怪'
 
 ## 定时发送配置
 scheduleConfig:

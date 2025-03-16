@@ -368,15 +368,22 @@ class SingleMsgHandler(MsgHandler):
             status = True
             wxId = content.replace(UnTalkMembers, '').strip()
             if wxId.endswith('@chatroom'):
+                # TODO use id
                 talkMemberResult = self.dms.showLastWeekTalkMembers(wxId)
+                roomMemberName = self.wcf.get_chatroom_members(wxId).values()
                 talkWxNames = [row[1] for row in talkMemberResult]
-                roomMemberIds = self.wcf.get_chatroom_members(wxId).values()
                 # 找到交集
-                intersection = set(talkWxNames) & set(roomMemberIds)
+                intersection = set(talkWxNames) & set(roomMemberName)
                 # 对交集取反
-                difference = set(roomMemberIds) - intersection
+                difference = set(roomMemberName) - intersection
+                talkContent = '\n'.join([f'{item}' for item in talkWxNames])
+                members = '\n'.join([f'{item}' for item in roomMemberName])
                 content = '\n'.join([f'{item}' for item in difference])
                 if content:
+                    # for debug
+                    self.sendTextMsg(msg, f'talk \n{talkContent}')
+                    self.sendTextMsg(msg, f'member\n{members}')
+                    # for debug
                     self.sendTextMsg(msg, f'7天未说话列表如下\n{content}')
                 else:
                     self.sendTextMsg(msg, f'7天未说话列表为空')
