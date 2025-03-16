@@ -10,6 +10,11 @@ from utils.common import logger, returnConfigData, returnVideoCacheFolder, downl
 configData = returnConfigData()['llmServer']
 
 model_dict = {
+    'gemini-2.0-flash-exp': {
+        'api_key': configData['oa_api_key'],
+        'base_url': configData['oa_base_url'],
+        'model_name': 'gemini-2.0-flash-exp'
+    },
     'gemini-1.5-pro': {
         'api_key': configData['oa_api_key'],
         'base_url': configData['oa_base_url'],
@@ -78,6 +83,10 @@ model_dict = {
 }
 
 image_model_dict = {
+    'Kwai-Kolors/Kolors': {
+        'model_name': 'Kwai-Kolors/Kolors',
+        'image_size': '1024x1024',
+    },
     'flux': {
         'model_name': 'black-forest-labs/FLUX.1-schnell', # dev 0.18/张
         'image_size': '1024x576',

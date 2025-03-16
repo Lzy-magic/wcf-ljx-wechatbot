@@ -7,3 +7,4 @@ output/
 !requirements.txt
 test.py
 config.yaml
+*.db

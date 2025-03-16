@@ -163,6 +163,6 @@ sys_room_summary = '''
 10.x
 '''
 
-welcome_msg = '''【我是谁】猴哥-小爱主理人
+welcome_msg = '''
 
 '''

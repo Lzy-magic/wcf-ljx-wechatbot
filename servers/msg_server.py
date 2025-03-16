@@ -198,9 +198,6 @@ class MsgHandler:
                 response = "你是需要我帮你理解图片么，请先发送一张图片哦，我会基于你的最近一张图片进行回答"
             self.sendTextMsg(msg, response)
             self.lra.updateMessage(chatid, [msg.content, response])
-        # 2.3 龙王统计
-        #elif intention in ['龙王', '群排行']:
-            #TODO 龙王统计
 
         # 保存消息到数据库
         self.addChatMsg(self.wxid, self.bot_name, chatid, response)
@@ -325,7 +322,7 @@ class SingleMsgHandler(MsgHandler):
                 else:
                     self.sendTextMsg(msg, f'{wxId} 删除群聊权限失败')
             else:
-                if self.dus.delUser(wxId, self.getWxName(wxId)):
+                if self.dus.delUser(wxId):
                     self.sendTextMsg(msg, f'{wxId} 已删除私聊权限')
                     # self.whiteUsers.remove(wxId)
                 else:
@@ -364,6 +361,24 @@ class SingleMsgHandler(MsgHandler):
                     # self.whiteUsers.add(wxId)
                 else:
                     self.sendTextMsg(msg, f'{wxId} 删除推送群失败')
+
+        # 7天未说话
+        UnTalkMembers = self.adminFunctionWord['UnTalkMembers']
+        if content.startswith(UnTalkMembers):
+            status = True
+            wxId = content.replace(UnTalkMembers, '').strip()
+            if wxId.endswith('@chatroom'):
+                list = self.drs.showLastWeekTalkMembers(wxId)
+                roomMemberIds = self.wcf.get_chatroom_members(wxId).keys()
+                # 找到交集
+                intersection = set(list) & set(roomMemberIds)
+                # 对交集取反
+                difference = set(roomMemberIds) - intersection
+                content = '\n'.join([f'{item}' for item in difference])
+                if list:
+                    self.sendTextMsg(msg, f'7天未说话列表如下{content}')
+                else:
+                    self.sendTextMsg(msg, f'7天未说话列表为空')
         
         return status
     

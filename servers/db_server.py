@@ -275,6 +275,34 @@ class DbMsgServer:
             closeDb(conn, cursor)
             return []
 
+    def showYesterdayRank(self, roomId):
+        conn, cursor = openDb(messageDb)
+        try:
+            cursor.execute(
+                "select wxName, count(*) as count from chatMessage where chatMessage.roomId = ? and strftime('%Y-%m-%d', createTime) = strftime('%Y-%m-%d', DATE('now', '-1 day')) group by wxId order by count desc",
+                (roomId))
+            result = cursor.fetchall()
+            closeDb(conn, cursor)
+            return result
+        except Exception as e:
+            logger.error(f'查看排行榜出现错误: {e}')
+            closeDb(conn, cursor)
+            return []
+
+    def showLastWeekTalkMembers(self, roomId):
+        conn, cursor = openDb(messageDb)
+        try:
+            cursor.execute(
+                "select wxid, wxname from chatMessage where strftime('%Y-%m-%d', createTime) > strftime('%Y-%m-%d', DATE('now', '-7 day')) AND roomId = ? GROUP BY wxId",
+                (roomId))
+            result = cursor.fetchall()
+            closeDb(conn, cursor)
+            return result
+        except Exception as e:
+            logger.error(f'查看群聊消息出现错误: {e}')
+            closeDb(conn, cursor)
+            return []
+
 if __name__ == '__main__':
     Dis = DbInitServer()
     Dis.initDb()

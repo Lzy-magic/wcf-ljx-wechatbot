@@ -88,6 +88,9 @@ adminFunctionWord:
   delUserWord:
     - '踢'
     - '已踢'
+  # 7天未说话
+    - UnTalkMembers:
+    - '未说话'
 
 ## API接口服务配置
 apiServer:
@@ -121,6 +124,7 @@ llmServer:
   oa_api_key: ''
   oa_base_url: 'http://xxx:4000/v1'
   model_name_list:
+   - 'gemini-2.0-flash'
    - 'glm-4-9b-chat'
    - 'glm4-flash'
    - 'glm4-9b'
