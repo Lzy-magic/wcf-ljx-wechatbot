@@ -179,12 +179,12 @@ class MsgHandler:
         # 2.0 未识别到指定意图，返回正常回复，否则根据意图进行相应的操作
         if intention not in intentions_list:
             response = self.lra.generalResponse(messages, self.bot_name)
-            self.sendTextMsg(msg, response)
+            #self.sendTextMsg(msg, response)
             self.lra.updateMessage(chatid, [msg.content, response])
         # 2.1 天气预报
         elif intention == '天气':
             response = self.lra.weatherResponse(msg.content, self.bot_name)
-            self.sendTextMsg(msg, response)
+            #self.sendTextMsg(msg, response)
             self.lra.updateMessage(chatid, [msg.content, response])
         # 2.2 图片理解
         elif intention in ['数学解题', '图片理解']:
@@ -196,7 +196,7 @@ class MsgHandler:
                 response = self.lra.mmResponse(image_path, msg.content, self.bot_name)
             else:
                 response = "你是需要我帮你理解图片么，请先发送一张图片哦，我会基于你的最近一张图片进行回答"
-            self.sendTextMsg(msg, response)
+            self.sendTextMsg("群聊功能暂时关闭咯", response)
             self.lra.updateMessage(chatid, [msg.content, response])
 
         # 保存消息到数据库
