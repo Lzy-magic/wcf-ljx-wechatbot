@@ -129,14 +129,14 @@ class MsgHandler:
             self.lra.updateMessage(chatid, [msg.content, response])
             # 保存消息到数据库
             self.addChatMsg(self.wxid, self.bot_name, chatid, response)
-        elif triggerType == 'difySearch':
+        #elif triggerType == 'difySearch':
             # 调用dify搜索智能体进行回复
-            pre_text = f'{self.bot_name}正在调用搜索引擎为您服务，请耐心等待哦，预计20-60s'
-            self.sendTextMsg(msg, pre_text)
-            response = self.lta.difySearch(content, user=self.bot_name)
-            self.sendTextMsg(msg, response)
-            self.lra.updateMessage(chatid, [msg.content, response])
-            self.addChatMsg(self.wxid, self.bot_name, chatid, response)
+           # pre_text = f'{self.bot_name}正在调用搜索引擎为您服务，请耐心等待哦，预计20-60s'
+            #self.sendTextMsg(msg, pre_text)
+           # response = self.lta.difySearch(content, user=self.bot_name)
+            #self.sendTextMsg(msg, response)
+           # self.lra.updateMessage(chatid, [msg.content, response])
+           # self.addChatMsg(self.wxid, self.bot_name, chatid, response)
         elif triggerType == 'beikeRetrive':
             match = re.search(r'\d+', content)
             if content.startswith('挂牌'):
@@ -368,22 +368,12 @@ class SingleMsgHandler(MsgHandler):
             status = True
             wxId = content.replace(UnTalkMembers, '').strip()
             if wxId.endswith('@chatroom'):
-                # TODO use id
                 talkMemberResult = self.dms.showLastWeekTalkMembers(wxId)
-                roomMemberName = self.wcf.get_chatroom_members(wxId).values()
+                roomMembers = self.wcf.get_chatroom_members(wxId)
                 talkWxNames = [row[1] for row in talkMemberResult]
-                # 找到交集
-                intersection = set(talkWxNames) & set(roomMemberName)
-                # 对交集取反
-                difference = set(roomMemberName) - intersection
-                talkContent = '\n'.join([f'{item}' for item in talkWxNames])
-                members = '\n'.join([f'{item}' for item in roomMemberName])
-                content = '\n'.join([f'{item}' for item in difference])
+                untalkMembers = {key: roomMembers[key] for key in roomMembers.keys() - talkMemberResult.keys()}
+                content = '\n'.join([f'{item}' for item in untalkMembers.values()])
                 if content:
-                    # for debug
-                    self.sendTextMsg(msg, f'talk \n{talkContent}')
-                    self.sendTextMsg(msg, f'member\n{members}')
-                    # for debug
                     self.sendTextMsg(msg, f'7天未说话列表如下\n{content}')
                 else:
                     self.sendTextMsg(msg, f'7天未说话列表为空')
@@ -545,11 +535,8 @@ class RoomMsgHandler(MsgHandler):
     def mainHandle(self, msg):
         roomId = msg.roomid
         sender = msg.sender
-        # 判断是否为白名单群聊
+
         # logger.info(f'收到群消息: {roomId} {self.drs.showWhiteRoom()}')
-        if not self.drs.searchWhiteRoom(roomId):
-            return
-        
         # 超管以及管理员功能
         if (self.judgeAdmin(sender, roomId) or self.judgeSuperAdmin(sender)):
             self.AdminFunction(msg)
@@ -557,6 +544,10 @@ class RoomMsgHandler(MsgHandler):
         # 入群欢迎
         if msg.type == 10000:
             self.joinRoomWelcome(msg)
+
+        # 判断是否为白名单群聊
+        if not self.drs.searchWhiteRoom(roomId):
+            return
         
         # 开始处理消息
         if msg.type == 1: # 文本消息
