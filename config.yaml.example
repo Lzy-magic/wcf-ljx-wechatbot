@@ -67,6 +67,15 @@ customKeyWord:
   beikeRetrive:
     - '挂牌'
     - '成交'
+  KfcKeyWords:
+    - 'Kfc'
+    - '疯狂星期四'
+    - '星期四'
+    - '今天星期四'
+    - 'KFC'
+    - 'kfc'
+    - 'v我50'
+    - '明天星期四'
 
 ## 管理功能关键词配置
 adminFunctionWord:
@@ -78,6 +87,12 @@ adminFunctionWord:
   addPushWord: '加推送'
   # 删除推送群
   delPushWord: '删推送'
+  # 添加回复群
+  AddResponseWord: '加回复'
+  # 删除回复群
+  delResponseWord: '删回复'
+  # 查询回复群
+  ShowResponseWord: '查回复'
   # 新增管理员关键词
   addAdminWord:
     - '添加管理员'
@@ -89,10 +104,11 @@ adminFunctionWord:
     - '踢'
     - '已踢'
   # 7天未说话
-    - UnTalkMembers:
+  UnTalkMembers:
     - '未说话'
 
 ## API接口服务配置
+KfcApi: 'https://api.pearktrue.cn/api/kfc'
 apiServer:
   # 高德 Key
   gaoDeKey: ''

@@ -764,3 +764,19 @@ class ApiServer:
         else:
             logger.error(f"获取微信视频失败: {response.status_code} {response.text}")
             return '获取微信视频失败'
+
+    def getKfc(self, ):
+        """
+        疯狂星期四
+        :return:
+        """
+        logger.info(f'[*]: 正在调用KFC疯狂星期四Api接口... ... ')
+        try:
+            jsonData = requests.get(url=self.configData['kfcApi'], timeout=30).json()
+            result = jsonData.get('text')
+            if result:
+                return result
+            return None
+        except Exception as e:
+            logger.error(f'[-]: KFC疯狂星期四Api接口出现错误, 错误信息: {e}')
+            return None
