@@ -108,7 +108,7 @@ adminFunctionWord:
     - '未说话'
 
 ## API接口服务配置
-KfcApi: 'https://api.pearktrue.cn/api/kfc'
+kfcApi: 'https://api.pearktrue.cn/api/kfc'
 apiServer:
   # 高德 Key
   gaoDeKey: ''

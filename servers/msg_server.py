@@ -189,10 +189,10 @@ class MsgHandler:
                 self.sendTextMsg(msg, response)
                 self.lra.updateMessage(chatid, [msg.content, response])
         # 2.1 天气预报
-        # elif intention == '天气':
-            # response = self.lra.weatherResponse(msg.content, self.bot_name)
-            # self.sendTextMsg(msg, response)
-            # self.lra.updateMessage(chatid, [msg.content, response])
+        elif intention == '天气':
+            response = self.lra.weatherResponse(msg.content, self.bot_name)
+            self.sendTextMsg(msg, response)
+            self.lra.updateMessage(chatid, [msg.content, response])
         # 2.2 图片理解
         # elif intention in ['数学解题', '图片理解']:
         #     picPath = returnPicCacheFolder()
@@ -339,9 +339,11 @@ class SingleMsgHandler(MsgHandler):
         addPushWord = self.adminFunctionWord['addPushWord']
         if content.startswith(addPushWord):
             status = True
-            wxId = content.replace(addPushWord, '').strip()
+            parms = content.split(" ")
+            taskName = parms[1]
+            wxId = parms[2]
             if wxId.endswith('@chatroom'):
-                if self.drs.addPushRoom(wxId, self.getWxName(wxId)):
+                if self.drs.addPushRoom(taskName, wxId, self.getWxName(wxId)):
                     self.sendTextMsg(msg, f'{wxId} 已添加推送群')
                     # self.whiteRooms.add(wxId)
                 else:
