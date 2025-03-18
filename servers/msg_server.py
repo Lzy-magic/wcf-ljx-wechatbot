@@ -183,7 +183,7 @@ class MsgHandler:
         # 2.0 未识别到指定意图，返回正常回复，否则根据意图进行相应的操作
         if intention not in intentions_list:
             if msg.from_group() and not self.drs.searchResponseRoom(chatid):
-                return
+                self.sendTextMsg(msg, "聊天功能暂时关闭咯~")
             else:
                 response = self.lra.generalResponse(messages, self.bot_name)
                 self.sendTextMsg(msg, response)
