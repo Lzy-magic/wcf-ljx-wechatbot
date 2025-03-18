@@ -248,7 +248,7 @@ class DbRoomServer:
             closeDb(conn, cursor)
             return []
         
-    def addResponseRoom(self, taskName, roomId, roomName):
+    def addResponseRoom(self, roomId, roomName):
         conn, cursor = openDb(roomDb)
         try:
             cursor.execute('INSERT INTO responseRoom VALUES (?, ?)', (roomId, roomName))
@@ -260,7 +260,7 @@ class DbRoomServer:
             closeDb(conn, cursor)
             return False
     
-    def delResponseRoom(self, taskName, roomId, roomName):
+    def delResponseRoom(self, roomId):
         conn, cursor = openDb(roomDb)
         try:
             cursor.execute('DELETE FROM responseRoom WHERE roomId=?', (roomId,))
@@ -272,7 +272,7 @@ class DbRoomServer:
             closeDb(conn, cursor)
             return False
     
-    def showResponseRoom(self, taskName=None):
+    def showResponseRoom(self):
         conn, cursor = openDb(roomDb)
         try:
             cursor.execute('SELECT roomId, roomName FROM responseRoom')

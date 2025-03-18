@@ -110,7 +110,7 @@ class MsgHandler:
         answer = self.lra.isAdPic(os.path.join(picPath, new_name))
         logger.info(f'图片是否为广告图片: {answer}')
         if answer == '是':
-            self.sendTextMsg(msg, '你小子是不是准备发广告？小心被群主发现！')
+            #self.sendTextMsg(msg, '你小子是不是准备发广告？小心被群主发现！')
             nickname = self.getWxName(msg.sender)
             roomname = self.getWxName(msg.roomid)
             for admin in self.superAdmins:    
@@ -376,7 +376,7 @@ class SingleMsgHandler(MsgHandler):
             status = True
             wxId = content.replace(AddResponseWord, '').strip()
             if wxId.endswith('@chatroom'):
-                if self.drs.addResponseRoom(wxId):
+                if self.drs.addResponseRoom(wxId, self.getWxName(wxId)):
                     self.sendTextMsg(msg, f'{wxId} 已添加回复群')                    
                 else:
                     self.sendTextMsg(msg, f'{wxId} 添加回复群失败')
