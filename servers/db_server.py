@@ -316,7 +316,7 @@ class DbMsgServer:
         conn, cursor = openDb(messageDb)
         try:
             #TODO != robot and format create time, token limit input 128k
-            cursor.execute('SELECT wxName, content, createTime FROM chatMessage WHERE roomId=? AND DATE(createTime)=?', (roomId, datetime.now().strftime('%Y-%m-%d')))
+            cursor.execute("SELECT wxName, content, createTime FROM chatMessage WHERE roomId=? AND DATE(createTime)= strftime('%Y-%m-%d', 'now', 'localtime')", (roomId, ))
             result = cursor.fetchall()
             closeDb(conn, cursor)
             return result
@@ -325,11 +325,11 @@ class DbMsgServer:
             closeDb(conn, cursor)
             return []
 
-    def showYesterdayRank(self, roomId):
+    def showTodayRank(self, roomId):
         conn, cursor = openDb(messageDb)
         try:
             cursor.execute(
-                "select wxName, count(*) as count from chatMessage where chatMessage.roomId = ? and strftime('%Y-%m-%d', createTime) = strftime('%Y-%m-%d', DATE('now')) group by wxId order by count desc",
+                "select wxName, count(*) as count from chatMessage where chatMessage.roomId = ? and strftime('%Y-%m-%d', createTime, 'localtime') = strftime('%Y-%m-%d', 'now', 'localtime') group by wxId order by count desc;",
                 (roomId,))
             result = cursor.fetchall()
             closeDb(conn, cursor)
@@ -343,7 +343,7 @@ class DbMsgServer:
         conn, cursor = openDb(messageDb)
         try:
             cursor.execute(
-                "select wxid, wxname from chatMessage where strftime('%Y-%m-%d', createTime) > strftime('%Y-%m-%d', DATE('now', '-7 day')) AND roomId = ? GROUP BY wxId",
+                "select wxid, wxname from chatMessage where strftime('%Y-%m-%d', createTime) > strftime('%Y-%m-%d', DATE('now', '-7 day', 'localtime')) AND roomId = ? GROUP BY wxId",
                 (roomId,))
             result = cursor.fetchall()
             closeDb(conn, cursor)
