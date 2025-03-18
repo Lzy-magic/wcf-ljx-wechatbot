@@ -163,6 +163,7 @@ class MsgHandler:
             return conId
        
     def coreFunction(self, msg):
+        response = ""
         chatid = msg.roomid if msg.from_group() else msg.sender
         # 1. 自定义关键词触发功能
         tStatus = []
@@ -208,7 +209,8 @@ class MsgHandler:
         # 2.3 图片理解
 
         # 保存消息到数据库
-        self.addChatMsg(self.wxid, self.bot_name, chatid, response)
+        if response != "":
+            self.addChatMsg(self.wxid, self.bot_name, chatid, response)
 
     def parseMsg(self, msg):
         """
