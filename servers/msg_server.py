@@ -182,7 +182,7 @@ class MsgHandler:
         logger.info(f'意图识别结果：{intention}')
         # 2.0 未识别到指定意图，返回正常回复，否则根据意图进行相应的操作
         if intention not in intentions_list:
-            if msg.from_group() and not self.drs.searchWhiteRoom(chatid):
+            if msg.from_group() and not self.drs.searchResponseRoom(chatid):
                 return
             else:
                 response = self.lra.generalResponse(messages, self.bot_name)
@@ -395,7 +395,7 @@ class SingleMsgHandler(MsgHandler):
             status = True
             wxId = content.replace(delResponseWord, '').strip()
             if wxId.endswith('@chatroom'):
-                if self.drs.delResponseWord(wxId):
+                if self.drs.delResponseRoom(wxId):
                     self.sendTextMsg(msg, f'{wxId} 已删除回复群')                    
                 else:
                     self.sendTextMsg(msg, f'{wxId} 删除回复群失败')

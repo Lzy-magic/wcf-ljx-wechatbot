@@ -329,7 +329,7 @@ class DbMsgServer:
         conn, cursor = openDb(messageDb)
         try:
             cursor.execute(
-                "select wxName, count(*) as count from chatMessage where chatMessage.roomId = ? and strftime('%Y-%m-%d', createTime) = strftime('%Y-%m-%d', DATE('now', '-1 day')) group by wxId order by count desc",
+                "select wxName, count(*) as count from chatMessage where chatMessage.roomId = ? and strftime('%Y-%m-%d', createTime) = strftime('%Y-%m-%d', DATE('now')) group by wxId order by count desc",
                 (roomId,))
             result = cursor.fetchall()
             closeDb(conn, cursor)
