@@ -412,7 +412,7 @@ class LLMTaskApi:
             {'role': 'system', 'content': sys_room_summary},
             {'role': 'user', 'content': contents},
         ]
-        result = unillm(self.model_name_list, messages=messages)
+        result = unillm(['glm4-9b'] + self.model_name_list, messages=messages)
         return result
             
 class LLMResponseApi:
