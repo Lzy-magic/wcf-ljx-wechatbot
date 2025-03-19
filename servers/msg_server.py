@@ -584,7 +584,9 @@ class RoomMsgHandler(MsgHandler):
         for wx_name in wx_names:
             roomMember = self.wcf.get_chatroom_members(msg.roomid)
             text = self.lta.roomWelcome(room_name=self.getWxName(msg.roomid), invitee=wx_name, index=len(roomMember))
+            welcomePrompmtText = self.lta.roomWelcomePrompmt(room_name=self.getWxName(msg.roomid), invitee=wx_name, index=len(roomMember))
             self.wcf.send_text(msg=text, receiver=msg.roomid)
+            self.wcf.send_text(msg=welcomePrompmtText, receiver=msg.roomid)
             
     def mainHandle(self, msg):
         roomId = msg.roomid

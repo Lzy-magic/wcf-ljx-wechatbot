@@ -337,6 +337,10 @@ class LLMTaskApi:
         result = unillm(self.model_name_list, messages=messages, temperature=0.8)
         return f'@{invitee} {result.strip()}'
 
+    def roomWelcomePrompmt(self, room_name, invitee, index):
+        messages = returnConfigData()['prompt']['welcome']
+        return f'@{invitee} {messages.strip()}'
+
     def difySearch(self, query, user):
         data = {
             "api_key": self.dify_search_key, 

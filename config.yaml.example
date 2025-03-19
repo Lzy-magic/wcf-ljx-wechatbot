@@ -107,6 +107,14 @@ adminFunctionWord:
   UnTalkMembers:
     - '未说话'
 
+prompt:
+  welcome: |
+    欢迎新朋友～
+    我是群机器人
+    其他人都很友善，随便唠~
+    n要打游戏就群里呼朋引伴，群管理会置顶车队招募信息哈~
+    例句：快速3=2（为顺利组队，建议ID改成游戏ID哈
+
 ## API接口服务配置
 kfcApi: 'https://api.pearktrue.cn/api/kfc'
 apiServer:
