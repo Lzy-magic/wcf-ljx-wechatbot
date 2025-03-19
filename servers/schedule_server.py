@@ -165,9 +165,9 @@ class ScheduleTaskServer:
                 chats = self.dms.showChatMessage(room_id)
                 ranks = self.dms.showTodayRank(room_id)
                 #TODO get 排行榜 use group and count
-                contents = '\n'.join([f'{chat[2]} {chat[0]}: {chat[1]}' for chat in chats])
+                chat_contents = '\n'.join([f'{chat[2]} {chat[0]}: {chat[1]}' for chat in chats])
                 rank_contents = '\n'.join([f'{rank[0]}: {rank[1]}' for rank in ranks])
-                contents = contents.join(rank_contents);
+                contents = f"{chat_contents}{rank_contents}";
                 if not contents:
                     contents = '无聊天记录'
                 content = self.lta.getRoomMessSummary(contents)
