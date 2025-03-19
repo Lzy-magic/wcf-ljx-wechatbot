@@ -166,7 +166,7 @@ class ScheduleTaskServer:
                 ranks = self.dms.showTodayRank(room_id)
                 chat_contents = '\n'.join([f'{chat[2]} {chat[0]}: {chat[1]}' for chat in chats])
                 rank_contents = '\n'.join([f'{rank[0]}: {rank[1]}' for rank in ranks])
-                contents = f"{chat_contents}{rank_contents}";
+                contents = f"{chat_contents}\n{rank_contents}";
                 if not contents:
                     contents = '无聊天记录'
                 content = self.lta.getRoomMessSummary(contents)
