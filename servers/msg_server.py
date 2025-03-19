@@ -116,7 +116,7 @@ class MsgHandler:
             for admin in self.superAdmins:    
                 msg.sender = admin
                 msg.roomid = admin
-                self.sendTextMsg(msg, f"{nickname}在{roomname}群发广告啦！")
+                #self.sendTextMsg(msg, f"{nickname}在{roomname}群发广告啦！")
 
     def triggerFunction(self, msg, triggerType, triggerWords, chatid):
         content = msg.content.strip()
