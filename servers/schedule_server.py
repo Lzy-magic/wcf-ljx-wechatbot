@@ -164,7 +164,6 @@ class ScheduleTaskServer:
             for room_id, room_name in room_items:
                 chats = self.dms.showChatMessage(room_id)
                 ranks = self.dms.showTodayRank(room_id)
-                #TODO get 排行榜 use group and count
                 chat_contents = '\n'.join([f'{chat[2]} {chat[0]}: {chat[1]}' for chat in chats])
                 rank_contents = '\n'.join([f'{rank[0]}: {rank[1]}' for rank in ranks])
                 contents = f"{chat_contents}{rank_contents}";
