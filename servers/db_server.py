@@ -316,7 +316,7 @@ class DbMsgServer:
         conn, cursor = openDb(messageDb)
         try:
             #TODO != robot and format create time, token limit input 128k
-            cursor.execute("SELECT wxName, content, createTime FROM chatMessage WHERE roomId=? AND DATE(createTime)= strftime('%Y-%m-%d', 'now', 'localtime')", (roomId, ))
+            cursor.execute("SELECT wxName, content, createTime FROM chatMessage WHERE roomId=? AND ('%Y-%m-%d', createTime, 'localtime') = strftime('%Y-%m-%d', 'now', 'localtime')", (roomId, ))
             result = cursor.fetchall()
             closeDb(conn, cursor)
             return result
