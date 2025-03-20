@@ -151,8 +151,9 @@ class MsgHandler:
             response = self.aps.getKfc()
             self.sendTextMsg(msg, response)
         elif triggerType == 'TopWords':
-            response = self.dms.showTodayRank(chatid)
-            content = self.lta.getTopSummary(response)
+            ranks = self.dms.showTodayRank(chatid)
+            rank_contents = '\n'.join([f'{rank[0]}: {rank[1]}' for rank in ranks])
+            content = self.lta.getTopSummary(rank_contents)
             self.sendTextMsg(msg, content)
         else:
             bot_answer = f'[-]: 未知的触发器类型: {triggerType}, 请检查配置'
