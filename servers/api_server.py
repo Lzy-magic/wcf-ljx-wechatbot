@@ -414,6 +414,14 @@ class LLMTaskApi:
         ]
         result = unillm(['glm4-9b'] + self.model_name_list, messages=messages)
         return result
+
+    def getTopSummary(self, contents):
+        messages = [
+            {'role': 'system', 'content': sys_room_summary},
+            {'role': 'user', 'content': contents},
+        ]
+        result = unillm(['glm4-9b'] + self.model_name_list, messages=messages)
+        return result
             
 class LLMResponseApi:
     def __init__(self):
