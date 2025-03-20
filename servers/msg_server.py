@@ -152,8 +152,8 @@ class MsgHandler:
             self.sendTextMsg(msg, response)
         elif triggerType == 'TopWords':
             response = self.dms.showTodayRank(chatid)
-            self.lta.getTopSummary(response)
-            self.sendTextMsg(msg, response)
+            content = self.lta.getTopSummary(response)
+            self.sendTextMsg(msg, content)
         else:
             bot_answer = f'[-]: 未知的触发器类型: {triggerType}, 请检查配置'
             self.sendTextMsg(msg, bot_answer)

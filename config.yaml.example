@@ -78,7 +78,7 @@ customKeyWord:
     - '明天星期四'
   TopWords:
     - 'top'
-    - '排行榜''
+    - '排行榜'
 
 ## 管理功能关键词配置
 adminFunctionWord:

@@ -4,7 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 from utils.common import logger, returnConfigData, downloadFile, encode_image
-from utils.prompt import sys_base_prompt, sys_birthday_wish, sys_weather_report, sys_intention_rec, sys_route_plan, sys_poi_rec, sys_poi_ext, sys_video_gen, sys_room_summary
+from utils.prompt import sys_base_prompt, sys_birthday_wish, sys_weather_report, sys_intention_rec, sys_route_plan, sys_poi_rec, sys_poi_ext, sys_video_gen, sys_room_summary, sys_room_rank_summary
 from utils.llm import UniLLM, generate_video_sf, generate_article
 
 unillm = UniLLM()
@@ -417,7 +417,7 @@ class LLMTaskApi:
 
     def getTopSummary(self, contents):
         messages = [
-            {'role': 'system', 'content': sys_room_summary},
+            {'role': 'system', 'content': sys_room_rank_summary},
             {'role': 'user', 'content': contents},
         ]
         result = unillm(['glm4-9b'] + self.model_name_list, messages=messages)
