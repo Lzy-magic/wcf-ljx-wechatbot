@@ -4,7 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 from utils.common import logger, returnConfigData, downloadFile, encode_image
-from utils.prompt import sys_base_prompt, sys_birthday_wish, sys_weather_report, sys_intention_rec, sys_route_plan, sys_poi_rec, sys_poi_ext, sys_video_gen, sys_room_summary
+from utils.prompt import sys_base_prompt, sys_birthday_wish, sys_weather_report, sys_intention_rec, sys_route_plan, sys_poi_rec, sys_poi_ext, sys_video_gen, sys_room_summary, sys_room_rank_summary
 from utils.llm import UniLLM, generate_video_sf, generate_article
 
 unillm = UniLLM()
@@ -337,6 +337,10 @@ class LLMTaskApi:
         result = unillm(self.model_name_list, messages=messages, temperature=0.8)
         return f'@{invitee} {result.strip()}'
 
+    def roomWelcomePrompmt(self, room_name, invitee, index):
+        messages = returnConfigData()['prompt']['welcome']
+        return f'@{invitee} {messages.strip()}'
+
     def difySearch(self, query, user):
         data = {
             "api_key": self.dify_search_key, 
@@ -408,7 +412,15 @@ class LLMTaskApi:
             {'role': 'system', 'content': sys_room_summary},
             {'role': 'user', 'content': contents},
         ]
-        result = unillm(self.model_name_list, messages=messages)
+        result = unillm(['glm4-9b'] + self.model_name_list, messages=messages)
+        return result
+
+    def getTopSummary(self, contents):
+        messages = [
+            {'role': 'system', 'content': sys_room_rank_summary},
+            {'role': 'user', 'content': contents},
+        ]
+        result = unillm(['glm4-9b'] + self.model_name_list, messages=messages)
         return result
             
 class LLMResponseApi:
@@ -764,3 +776,19 @@ class ApiServer:
         else:
             logger.error(f"获取微信视频失败: {response.status_code} {response.text}")
             return '获取微信视频失败'
+
+    def getKfc(self, ):
+        """
+        疯狂星期四
+        :return:
+        """
+        logger.info(f'[*]: 正在调用KFC疯狂星期四Api接口... ... ')
+        try:
+            jsonData = requests.get(url=self.configData['kfcApi'], timeout=30).json()
+            result = jsonData.get('text')
+            if result:
+                return result
+            return None
+        except Exception as e:
+            logger.error(f'[-]: KFC疯狂星期四Api接口出现错误, 错误信息: {e}')
+            return None

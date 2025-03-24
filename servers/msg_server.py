@@ -110,42 +110,51 @@ class MsgHandler:
         answer = self.lra.isAdPic(os.path.join(picPath, new_name))
         logger.info(f'图片是否为广告图片: {answer}')
         if answer == '是':
-            self.sendTextMsg(msg, '你小子是不是准备发广告？小心被群主发现！')
+            #self.sendTextMsg(msg, '你小子是不是准备发广告？小心被群主发现！')
             nickname = self.getWxName(msg.sender)
             roomname = self.getWxName(msg.roomid)
             for admin in self.superAdmins:    
                 msg.sender = admin
                 msg.roomid = admin
-                self.sendTextMsg(msg, f"{nickname}在{roomname}群发广告啦！")
+                #self.sendTextMsg(msg, f"{nickname}在{roomname}群发广告啦！")
 
     def triggerFunction(self, msg, triggerType, triggerWords, chatid):
         content = msg.content.strip()
         if not any(content.startswith(t) for t in triggerWords):
             return False
-        if triggerType == 'gzhRetrive':
-            # 调用指定公众号文章进行回复
-            response = self.aps.get_yuanqi(content)
-            self.sendTextMsg(msg, response)
-            self.lra.updateMessage(chatid, [msg.content, response])
-            # 保存消息到数据库
-            self.addChatMsg(self.wxid, self.bot_name, chatid, response)
-        elif triggerType == 'difySearch':
+        # TODO modify
+        # if triggerType == 'gzhRetrive':
+        #     # 调用指定公众号文章进行回复
+        #     response = self.aps.get_yuanqi(content)
+        #     self.sendTextMsg(msg, response)
+        #     self.lra.updateMessage(chatid, [msg.content, response])
+        #     # 保存消息到数据库
+        #     self.addChatMsg(self.wxid, self.bot_name, chatid, response)
+        #elif triggerType == 'difySearch':
             # 调用dify搜索智能体进行回复
-            pre_text = f'{self.bot_name}正在调用搜索引擎为您服务，请耐心等待哦，预计20-60s'
-            self.sendTextMsg(msg, pre_text)
-            response = self.lta.difySearch(content, user=self.bot_name)
+           # pre_text = f'{self.bot_name}正在调用搜索引擎为您服务，请耐心等待哦，预计20-60s'
+            #self.sendTextMsg(msg, pre_text)
+           # response = self.lta.difySearch(content, user=self.bot_name)
+            #self.sendTextMsg(msg, response)
+           # self.lra.updateMessage(chatid, [msg.content, response])
+           # self.addChatMsg(self.wxid, self.bot_name, chatid, response)
+        # elif triggerType == 'beikeRetrive':
+        #     match = re.search(r'\d+', content)
+        #     if content.startswith('挂牌'):
+        #         bot_answer = f'https://yc.ke.com/ershoufang/{match.group()}.html' if match else '请输入正确的挂牌房源号'
+        #     elif content.startswith('成交'):
+        #         bot_answer = f'https://yc.ke.com/chengjiao/{match.group()}.html' if match else '请输入正确的成交房源号'
+        #     else:
+        #         bot_answer = '请输入正确的指令'
+        #     self.sendTextMsg(msg, bot_answer)
+        elif triggerType == 'KfcKeyWords':   
+            response = self.aps.getKfc()
             self.sendTextMsg(msg, response)
-            self.lra.updateMessage(chatid, [msg.content, response])
-            self.addChatMsg(self.wxid, self.bot_name, chatid, response)
-        elif triggerType == 'beikeRetrive':
-            match = re.search(r'\d+', content)
-            if content.startswith('挂牌'):
-                bot_answer = f'https://yc.ke.com/ershoufang/{match.group()}.html' if match else '请输入正确的挂牌房源号'
-            elif content.startswith('成交'):
-                bot_answer = f'https://yc.ke.com/chengjiao/{match.group()}.html' if match else '请输入正确的成交房源号'
-            else:
-                bot_answer = '请输入正确的指令'
-            self.sendTextMsg(msg, bot_answer)
+        elif triggerType == 'TopWords':
+            ranks = self.dms.showTodayRank(chatid)
+            rank_contents = '\n'.join([f'{rank[0]}: {rank[1]}' for rank in ranks])
+            content = self.lta.getTopSummary(rank_contents)
+            self.sendTextMsg(msg, content)
         else:
             bot_answer = f'[-]: 未知的触发器类型: {triggerType}, 请检查配置'
             self.sendTextMsg(msg, bot_answer)
@@ -159,6 +168,7 @@ class MsgHandler:
             return conId
        
     def coreFunction(self, msg):
+        response = ""
         chatid = msg.roomid if msg.from_group() else msg.sender
         # 1. 自定义关键词触发功能
         tStatus = []
@@ -178,32 +188,34 @@ class MsgHandler:
         logger.info(f'意图识别结果：{intention}')
         # 2.0 未识别到指定意图，返回正常回复，否则根据意图进行相应的操作
         if intention not in intentions_list:
-            response = self.lra.generalResponse(messages, self.bot_name)
-            self.sendTextMsg(msg, response)
-            self.lra.updateMessage(chatid, [msg.content, response])
+            if msg.from_group() and not self.drs.searchResponseRoom(chatid):
+                self.sendTextMsg(msg, "聊天功能暂时关闭咯~")
+            else:
+                response = self.lra.generalResponse(messages, self.bot_name)
+                self.sendTextMsg(msg, response)
+                self.lra.updateMessage(chatid, [msg.content, response])
         # 2.1 天气预报
         elif intention == '天气':
             response = self.lra.weatherResponse(msg.content, self.bot_name)
             self.sendTextMsg(msg, response)
             self.lra.updateMessage(chatid, [msg.content, response])
         # 2.2 图片理解
-        elif intention in ['数学解题', '图片理解']:
-            picPath = returnPicCacheFolder()
-            prefix = f'{msg.sender}_{msg.roomid}_'
-            img_files = sorted([f for f in os.listdir(picPath) if f.startswith(prefix)])
-            image_path = os.path.join(picPath, img_files[-1]) if img_files else None
-            if image_path:
-                response = self.lra.mmResponse(image_path, msg.content, self.bot_name)
-            else:
-                response = "你是需要我帮你理解图片么，请先发送一张图片哦，我会基于你的最近一张图片进行回答"
-            self.sendTextMsg(msg, response)
-            self.lra.updateMessage(chatid, [msg.content, response])
-        # 2.3 龙王统计
-        #elif intention in ['龙王', '群排行']:
-            #TODO 龙王统计
+        # elif intention in ['数学解题', '图片理解']:
+        #     picPath = returnPicCacheFolder()
+        #     prefix = f'{msg.sender}_{msg.roomid}_'
+        #     img_files = sorted([f for f in os.listdir(picPath) if f.startswith(prefix)])
+        #     image_path = os.path.join(picPath, img_files[-1]) if img_files else None
+        #     if image_path:
+        #         response = self.lra.mmResponse(image_path, msg.content, self.bot_name)
+        #     else:
+        #         response = "你是需要我帮你理解图片么，请先发送一张图片哦，我会基于你的最近一张图片进行回答"
+        #     self.sendTextMsg(msg, response)
+        #     self.lra.updateMessage(chatid, [msg.content, response])
+        # 2.3 图片理解
 
         # 保存消息到数据库
-        self.addChatMsg(self.wxid, self.bot_name, chatid, response)
+        if response != "":
+            self.addChatMsg(self.wxid, self.bot_name, chatid, response)
 
     def parseMsg(self, msg):
         """
@@ -325,7 +337,7 @@ class SingleMsgHandler(MsgHandler):
                 else:
                     self.sendTextMsg(msg, f'{wxId} 删除群聊权限失败')
             else:
-                if self.dus.delUser(wxId, self.getWxName(wxId)):
+                if self.dus.delUser(wxId):
                     self.sendTextMsg(msg, f'{wxId} 已删除私聊权限')
                     # self.whiteUsers.remove(wxId)
                 else:
@@ -334,9 +346,11 @@ class SingleMsgHandler(MsgHandler):
         addPushWord = self.adminFunctionWord['addPushWord']
         if content.startswith(addPushWord):
             status = True
-            wxId = content.replace(addPushWord, '').strip()
+            parms = content.split(" ")
+            taskName = parms[1]
+            wxId = parms[2]
             if wxId.endswith('@chatroom'):
-                if self.drs.addPushRoom(wxId, self.getWxName(wxId)):
+                if self.drs.addPushRoom(taskName, wxId, self.getWxName(wxId)):
                     self.sendTextMsg(msg, f'{wxId} 已添加推送群')
                     # self.whiteRooms.add(wxId)
                 else:
@@ -364,6 +378,63 @@ class SingleMsgHandler(MsgHandler):
                     # self.whiteUsers.add(wxId)
                 else:
                     self.sendTextMsg(msg, f'{wxId} 删除推送群失败')
+
+         # 增加回复群
+        AddResponseWord = self.adminFunctionWord['AddResponseWord']
+        if content.startswith(AddResponseWord):
+            status = True
+            wxId = content.replace(AddResponseWord, '').strip()
+            if wxId.endswith('@chatroom'):
+                if self.drs.addResponseRoom(wxId, self.getWxName(wxId)):
+                    self.sendTextMsg(msg, f'{wxId} 已添加回复群')                    
+                else:
+                    self.sendTextMsg(msg, f'{wxId} 添加回复群失败')
+            else:
+                if self.dus.delUser(wxId, self.getWxName(wxId)):
+                    self.sendTextMsg(msg, f'{wxId} 已添加回复群')
+                    # self.whiteUsers.add(wxId)
+                else:
+                    self.sendTextMsg(msg, f'{wxId} 添加回复群失败')
+
+        # 删除回复群
+        delResponseWord = self.adminFunctionWord['delResponseWord']
+        if content.startswith(delResponseWord):
+            status = True
+            wxId = content.replace(delResponseWord, '').strip()
+            if wxId.endswith('@chatroom'):
+                if self.drs.delResponseRoom(wxId):
+                    self.sendTextMsg(msg, f'{wxId} 已删除回复群')                    
+                else:
+                    self.sendTextMsg(msg, f'{wxId} 删除回复群失败')
+            else:
+                if self.dus.delUser(wxId, self.getWxName(wxId)):
+                    self.sendTextMsg(msg, f'{wxId} 已删除回复群')
+                    # self.whiteUsers.add(wxId)
+                else:
+                    self.sendTextMsg(msg, f'{wxId} 删除回复群失败')
+
+        # 查询回复群
+        ShowResponseWord = self.adminFunctionWord['ShowResponseWord']
+        if content.startswith(ShowResponseWord):
+            status = True
+            wxId = content.replace(ShowResponseWord, '').strip()
+            response = self.drs.showResponseRoom()
+            self.sendTextMsg(msg, f'回复群如下:\n{response}')
+
+        # 7天未说话
+        UnTalkMembers = self.adminFunctionWord['UnTalkMembers']
+        if content.startswith(UnTalkMembers):
+            status = True
+            wxId = content.replace(UnTalkMembers, '').strip()
+            if wxId.endswith('@chatroom'):
+                talkMemberResult = dict(self.dms.showLastWeekTalkMembers(wxId))
+                roomMembers = self.wcf.get_chatroom_members(wxId)
+                untalkMembers = {key: roomMembers[key] for key in roomMembers.keys() - talkMemberResult.keys()}
+                content = '\n'.join([f'{item}' for item in untalkMembers.values()])
+                if content:
+                    self.sendTextMsg(msg, f'7天未说话列表如下\n{content}')
+                else:
+                    self.sendTextMsg(msg, f'7天未说话列表为空')
         
         return status
     
@@ -517,16 +588,15 @@ class RoomMsgHandler(MsgHandler):
         for wx_name in wx_names:
             roomMember = self.wcf.get_chatroom_members(msg.roomid)
             text = self.lta.roomWelcome(room_name=self.getWxName(msg.roomid), invitee=wx_name, index=len(roomMember))
+            welcomePrompmtText = self.lta.roomWelcomePrompmt(room_name=self.getWxName(msg.roomid), invitee=wx_name, index=len(roomMember))
             self.wcf.send_text(msg=text, receiver=msg.roomid)
+            self.wcf.send_text(msg=welcomePrompmtText, receiver=msg.roomid)
             
     def mainHandle(self, msg):
         roomId = msg.roomid
         sender = msg.sender
-        # 判断是否为白名单群聊
+
         # logger.info(f'收到群消息: {roomId} {self.drs.showWhiteRoom()}')
-        if not self.drs.searchWhiteRoom(roomId):
-            return
-        
         # 超管以及管理员功能
         if (self.judgeAdmin(sender, roomId) or self.judgeSuperAdmin(sender)):
             self.AdminFunction(msg)
@@ -534,6 +604,10 @@ class RoomMsgHandler(MsgHandler):
         # 入群欢迎
         if msg.type == 10000:
             self.joinRoomWelcome(msg)
+
+        # 判断是否为白名单群聊
+        if not self.drs.searchWhiteRoom(roomId):
+            return
         
         # 开始处理消息
         if msg.type == 1: # 文本消息

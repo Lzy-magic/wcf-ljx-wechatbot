@@ -4,7 +4,7 @@ Administrators:
 
 ## 系统配置
 systemConfig:
-  robotName: '小爱'
+  robotName: '小怪'
 
 ## 定时发送配置
 scheduleConfig:
@@ -67,6 +67,18 @@ customKeyWord:
   beikeRetrive:
     - '挂牌'
     - '成交'
+  KfcKeyWords:
+    - 'Kfc'
+    - '疯狂星期四'
+    - '星期四'
+    - '今天星期四'
+    - 'KFC'
+    - 'kfc'
+    - 'v我50'
+    - '明天星期四'
+  TopWords:
+    - 'top'
+    - '排行榜'
 
 ## 管理功能关键词配置
 adminFunctionWord:
@@ -78,6 +90,12 @@ adminFunctionWord:
   addPushWord: '加推送'
   # 删除推送群
   delPushWord: '删推送'
+  # 添加回复群
+  AddResponseWord: '加回复'
+  # 删除回复群
+  delResponseWord: '删回复'
+  # 查询回复群
+  ShowResponseWord: '查回复'
   # 新增管理员关键词
   addAdminWord:
     - '添加管理员'
@@ -88,8 +106,20 @@ adminFunctionWord:
   delUserWord:
     - '踢'
     - '已踢'
+  # 7天未说话
+  UnTalkMembers:
+    - '未说话'
+
+prompt:
+  welcome: |
+    欢迎新朋友～
+    我是群机器人
+    其他人都很友善，随便唠~
+    要打游戏就群里呼朋引伴，群管理会置顶车队招募信息哈~
+    例句：快速3=2（为顺利组队，建议ID改成游戏ID哈
 
 ## API接口服务配置
+kfcApi: 'https://api.pearktrue.cn/api/kfc'
 apiServer:
   # 高德 Key
   gaoDeKey: ''
@@ -121,6 +151,7 @@ llmServer:
   oa_api_key: ''
   oa_base_url: 'http://xxx:4000/v1'
   model_name_list:
+   - 'gemini-2.0-flash'
    - 'glm-4-9b-chat'
    - 'glm4-flash'
    - 'glm4-9b'

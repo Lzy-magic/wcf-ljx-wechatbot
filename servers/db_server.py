@@ -46,6 +46,7 @@ class DbInitServer:
         conn, cursor = openDb(roomDb)
         self.createTable(cursor, 'whiteRoom', 'roomId varchar(255) PRIMARY KEY, roomName varchar(255)')
         self.createTable(cursor, 'pushRoom', 'taskName varchar(255), roomId varchar(255), roomName varchar(255), PRIMARY KEY (taskName, roomId)')
+        self.createTable(cursor, 'responseRoom', 'roomId varchar(255) PRIMARY KEY, roomName varchar(255)')
         closeDb(conn, cursor)
         # 初始化消息数据库 消息表 群聊消息表
         conn, cursor = openDb(messageDb)
@@ -240,9 +241,58 @@ class DbRoomServer:
             else:
                 cursor.execute('SELECT * FROM pushRoom')
             result = cursor.fetchall()
+            closeDb(conn, cursor)
             return result
         except Exception as e:
             logger.error(f'查看推送任务出现错误: {e}')
+            closeDb(conn, cursor)
+            return []
+        
+    def addResponseRoom(self, roomId, roomName):
+        conn, cursor = openDb(roomDb)
+        try:
+            cursor.execute('INSERT INTO responseRoom VALUES (?, ?)', (roomId, roomName))
+            conn.commit()
+            closeDb(conn, cursor)
+            return True
+        except Exception as e:
+            logger.error(f'新增回复群出现错误: {e}')
+            closeDb(conn, cursor)
+            return False
+    
+    def delResponseRoom(self, roomId):
+        conn, cursor = openDb(roomDb)
+        try:
+            cursor.execute('DELETE FROM responseRoom WHERE roomId=?', (roomId,))
+            conn.commit()
+            closeDb(conn, cursor)
+            return True
+        except Exception as e:
+            logger.error(f'删除回复群出现错误: {e}')
+            closeDb(conn, cursor)
+            return False
+    
+    def showResponseRoom(self):
+        conn, cursor = openDb(roomDb)
+        try:
+            cursor.execute('SELECT roomId, roomName FROM responseRoom')
+            result = cursor.fetchall()
+            closeDb(conn, cursor)
+            return result
+        except Exception as e:
+            logger.error(f'查看回复群出现错误: {e}')
+            closeDb(conn, cursor)
+            return []
+        
+    def searchResponseRoom(self, roomId):
+        conn, cursor = openDb(roomDb)
+        try:
+            cursor.execute('SELECT roomId, roomName FROM responseRoom WHERE roomId=?', (roomId, ))
+            result = cursor.fetchone()
+            closeDb(conn, cursor)
+            return True if result else False
+        except Exception as e:
+            logger.error(f'查询回复群出现错误: {e}')
             closeDb(conn, cursor)
             return []
 
@@ -266,7 +316,35 @@ class DbMsgServer:
         conn, cursor = openDb(messageDb)
         try:
             #TODO != robot and format create time, token limit input 128k
-            cursor.execute('SELECT wxName, content, createTime FROM chatMessage WHERE roomId=? AND DATE(createTime)=?', (roomId, datetime.now().strftime('%Y-%m-%d')))
+            cursor.execute("SELECT wxName, content, createTime FROM chatMessage WHERE roomId=? AND ('%Y-%m-%d', createTime, 'localtime') = strftime('%Y-%m-%d', 'now', 'localtime')", (roomId, ))
+            result = cursor.fetchall()
+            closeDb(conn, cursor)
+            return result
+        except Exception as e:
+            logger.error(f'查看群聊消息出现错误: {e}')
+            closeDb(conn, cursor)
+            return []
+
+    def showTodayRank(self, roomId):
+        conn, cursor = openDb(messageDb)
+        try:
+            cursor.execute(
+                "select wxName, count(*) as count from chatMessage where chatMessage.roomId = ? and strftime('%Y-%m-%d', createTime, 'localtime') = strftime('%Y-%m-%d', 'now', 'localtime') group by wxId order by count desc;",
+                (roomId,))
+            result = cursor.fetchall()
+            closeDb(conn, cursor)
+            return result
+        except Exception as e:
+            logger.error(f'查看排行榜出现错误: {e}')
+            closeDb(conn, cursor)
+            return []
+
+    def showLastWeekTalkMembers(self, roomId):
+        conn, cursor = openDb(messageDb)
+        try:
+            cursor.execute(
+                "select wxid, wxname from chatMessage where strftime('%Y-%m-%d', createTime) > strftime('%Y-%m-%d', DATE('now', '-7 day', 'localtime')) AND roomId = ? GROUP BY wxId",
+                (roomId,))
             result = cursor.fetchall()
             closeDb(conn, cursor)
             return result
