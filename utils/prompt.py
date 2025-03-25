@@ -147,20 +147,6 @@ sys_room_summary = '''
 内容：xxx
 评价：xxx
 ------------
-
-今日话唠冠军：👑xxx👑！
-
-今日话痨排行榜如下：
-1.x
-2.x
-3.x
-4.x
-5.x
-6.x
-7.x
-8.x
-9.x
-10.x
 '''
 
 sys_room_rank_summary = '''

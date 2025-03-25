@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from utils.common import logger, returnConfigData, downloadFile, encode_image
 from utils.prompt import sys_base_prompt, sys_birthday_wish, sys_weather_report, sys_intention_rec, sys_route_plan, sys_poi_rec, sys_poi_ext, sys_video_gen, sys_room_summary, sys_room_rank_summary
 from utils.llm import UniLLM, generate_video_sf, generate_article
+from servers.db_server import DbMsgServer
 
 unillm = UniLLM()
 
@@ -16,6 +17,7 @@ class GaoDeApi:
         """
         self.url = "https://restapi.amap.com/v3/"
         self.key = returnConfigData()['apiServer']['gaoDeKey']
+        self.dms = DbMsgServer()
     
     def get_api_response(self, url, params):
         try:
@@ -414,14 +416,6 @@ class LLMTaskApi:
         ]
         result = unillm(['glm4-9b'] + self.model_name_list, messages=messages)
         return result
-
-    def getTopSummary(self, contents):
-        messages = [
-            {'role': 'system', 'content': sys_room_rank_summary},
-            {'role': 'user', 'content': contents},
-        ]
-        result = unillm(['glm4-9b'] + self.model_name_list, messages=messages)
-        return result
             
 class LLMResponseApi:
     def __init__(self):
@@ -792,3 +786,10 @@ class ApiServer:
         except Exception as e:
             logger.error(f'[-]: KFC疯狂星期四Api接口出现错误, 错误信息: {e}')
             return None
+    
+    def getTopSummary(self, room_id):
+        ranks = self.dms.showTodayRank(room_id)
+        rank_contents = '\n'.join([f'{index+1}. {talker}: {talker_chat_count}' for index, (talker, talker_chat_count) in enumerate(ranks.items())])
+        top_talker_name, top_talker_name_chat_count = next(iter(ranks.items()))
+        rank_contents = f'今日龙王为：👑{top_talker_name}👑\n\n 今日发言排行榜为：\n{rank_contents}'
+        return rank_contents

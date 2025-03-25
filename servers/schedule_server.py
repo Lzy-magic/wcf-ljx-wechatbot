@@ -163,15 +163,14 @@ class ScheduleTaskServer:
         try:
             for room_id, room_name in room_items:
                 chats = self.dms.showChatMessage(room_id)
-                ranks = self.dms.showTodayRank(room_id)
-                chat_contents = '\n'.join([f'{chat[2]} {chat[0]}: {chat[1]}' for chat in chats])
-                rank_contents = '\n'.join([f'{rank[0]}: {rank[1]}' for rank in ranks])
-                contents = f"{chat_contents}\n{rank_contents}";
-                if not contents:
-                    contents = '无聊天记录'
-                content = self.lta.getRoomMessSummary(contents)
-                if content:
-                    self.wcf.send_text(msg=content, receiver=room_id)
+                chat_contents = '\n'.join([f'{chat[2]} {chat[0]}: {chat[1]}' for chat in chats])                
+                rank_contents = self.ams.getTopSummary(room_id)
+                if not chat_contents:
+                    chat_contents = '无聊天记录'
+                chat_contents = self.lta.getRoomMessSummary(chat_contents)
+                if chat_contents:
+                    self.wcf.send_text(msg=chat_contents, receiver=room_id)
+                    self.wcf.send_text(msg=rank_contents, receiver=room_id)
                     logger.info(f'群{room_name}总结推送成功')
                 else:
                     logger.info(f'群{room_name}总结推送失败')
