@@ -144,7 +144,7 @@ def downloadFile(url, prefix='moyu_', suffix='.jpg', type='pic'):
     else:
         return ''
 
-def SaveDictToExcel(self, dict, roomId):
+def SaveDictToExcel(dict, roomId):
     path = f'{returnExcelFolder()/{roomId}.xlsx}'
     df = pd.DataFrame(data=dict, index=[0])        
     df = (df.T)
