@@ -426,6 +426,7 @@ class SingleMsgHandler(MsgHandler):
             wxId = content.replace(UnTalkMembers, '').strip()
             if wxId.endswith('@chatroom'):
                 talkMemberResult = dict(self.dms.showLastWeekTalkMembers(wxId))
+                talkMemberResult[self.wxid] = self.wxname
                 roomMembers = self.wcf.get_chatroom_members(wxId)
                 untalkMembers = {key: roomMembers[key] for key in roomMembers.keys() - talkMemberResult.keys()}
                 content = '\n'.join([f'{item}' for item in untalkMembers.values()])
