@@ -4,7 +4,7 @@ import os
 import shutil
 from datetime import datetime
 import xml.etree.ElementTree as ET
-from utils.common import logger, returnConfigData, returnPicCacheFolder
+from utils.common import logger, returnConfigData, returnPicCacheFolder, SaveDictToExcel
 from utils.prompt import intentions_list, welcome_msg
 from servers.db_server import DbRoomServer, DbUserServer, DbMsgServer
 from servers.api_server import LLMTaskApi, ApiServer, LLMResponseApi
@@ -431,7 +431,9 @@ class SingleMsgHandler(MsgHandler):
                 untalkMembers = {key: roomMembers[key] for key in roomMembers.keys() - talkMemberResult.keys()}
                 content = '\n'.join([f'{wxid}:{wxname}' for wxid,wxname in untalkMembers.items()])
                 if content:
-                    self.sendTextMsg(msg, f'7天未说话列表如下\n{content}')
+                    path = SaveDictToExcel(untalkMembers, wxId)
+                    #self.sendTextMsg(msg, f'7天未说话列表如下\n{content}')
+                    self.sendFileMsg(msg, path, "other")
                 else:
                     self.sendTextMsg(msg, f'7天未说话列表为空')
         

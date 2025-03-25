@@ -3,6 +3,7 @@ import yaml
 import base64
 import logging
 import requests
+import pandas as pd
 from datetime import datetime
 
 def setup_logger():
@@ -82,6 +83,13 @@ def returnAvatarFolder():
     """
     return returnCachePath() + '/weChatAvatarFolder'
 
+def returnExcelFolder():
+    """
+    返回excel文件夹
+    :return:
+    """
+    return returnCachePath() + '/excelFolder'
+
 def clearCacheFolder():
     """
     清空缓存文件夹所有文件
@@ -91,6 +99,7 @@ def clearCacheFolder():
     file_lists += [returnPicCacheFolder() + '/' + file for file in os.listdir(returnPicCacheFolder())]
     file_lists += [returnVideoCacheFolder() + '/' + file for file in os.listdir(returnVideoCacheFolder())]
     file_lists += [returnAvatarFolder() + '/' + file for file in os.listdir(returnAvatarFolder())]
+    file_lists += [returnExcelFolder() + '/' + file for file in os.listdir(returnExcelFolder())]
     for rm_file in file_lists:
         os.remove(rm_file)
     return True
@@ -106,6 +115,8 @@ def initCacheFolder():
         os.mkdir(returnVideoCacheFolder())
     if not os.path.exists(returnAvatarFolder()):
         os.mkdir(returnAvatarFolder())
+    if not os.path.exists(returnExcelFolder()):
+        os.mkdir(returnExcelFolder())
     logger.info(f'初始化缓存文件夹成功!!!')
 
 def encode_image(image_path='', image_bin=None):
@@ -132,3 +143,10 @@ def downloadFile(url, prefix='moyu_', suffix='.jpg', type='pic'):
         return file_path
     else:
         return ''
+
+def SaveDictToExcel(self, dict, roomId):
+    path = f'{returnExcelFolder()/{roomId}.xlsx}'
+    df = pd.DataFrame(data=dict, index=[0])        
+    df = (df.T)
+    df.to_excel(path)
+    return path

@@ -4,3 +4,4 @@ schedule
 lunarcalendar
 bs4
 openai
+pandas
