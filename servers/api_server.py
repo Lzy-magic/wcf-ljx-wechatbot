@@ -789,7 +789,7 @@ class ApiServer:
             return None
     
     def getTopSummary(self, room_id):
-        ranks = self.dms.showTodayRank(room_id)
+        ranks = dict(self.dms.showTodayRank(room_id))
         rank_contents = '\n'.join([f'{index+1}. {talker}: {talker_chat_count}' for index, (talker, talker_chat_count) in enumerate(ranks.items())])
         top_talker_name, top_talker_name_chat_count = next(iter(ranks.items()))
         rank_contents = f'今日龙王为：👑{top_talker_name}👑\n\n 今日发言排行榜为：\n{rank_contents}'
