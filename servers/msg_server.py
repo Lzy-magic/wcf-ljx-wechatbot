@@ -429,7 +429,7 @@ class SingleMsgHandler(MsgHandler):
                 talkMemberResult[self.wxid] = self.wxname
                 roomMembers = self.wcf.get_chatroom_members(wxId)
                 untalkMembers = {key: roomMembers[key] for key in roomMembers.keys() - talkMemberResult.keys()}
-                content = '\n'.join([f'{item}' for item in untalkMembers.values()])
+                content = '\n'.join([f'{wxid}:{wxname}' for wxid,wxname in untalkMembers.items()])
                 if content:
                     self.sendTextMsg(msg, f'7天未说话列表如下\n{content}')
                 else:
