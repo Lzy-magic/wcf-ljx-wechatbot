@@ -5,3 +5,4 @@ lunarcalendar
 bs4
 openai
 pandas
+openpyxl
