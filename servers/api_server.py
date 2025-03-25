@@ -589,7 +589,8 @@ class ApiServer:
         """
         所有api接口的总体调用
         """
-        self.configData = returnConfigData()
+        self.configData = returnConfigData()            
+        self.dms = DbMsgServer()
 
     def get_zaobao_al(self, format='json', ret='url'):
         params = {
