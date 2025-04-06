@@ -221,10 +221,10 @@ class DbRoomServer:
             closeDb(conn, cursor)
             return False
     
-    def delPushRoom(self, taskName, roomId, roomName):
+    def delPushRoom(self, taskName, roomId):
         conn, cursor = openDb(roomDb)
         try:
-            cursor.execute('DELETE FROM pushRoom WHERE taskName=? AND roomId=? AND roomName=?', (taskName, roomId, roomName))
+            cursor.execute('DELETE FROM pushRoom WHERE taskName=? AND roomId=?', (taskName, roomId))
             conn.commit()
             closeDb(conn, cursor)
             return True
