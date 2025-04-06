@@ -639,5 +639,5 @@ class GhMsgHandler(MsgHandler):
         info = f"公众号：{gh_name}\n标题：{title}\n链接：{url}\n时间：{datetime.now().strftime('%Y-%m-%d %H:%M')}"
         for admin in self.superAdmins:
             msg.sender = admin
-            self.sendTextMsg(msg, info)
+            #self.sendTextMsg(msg, info)
             # self.wcf.forward_msg(msg.id, admin)
