@@ -363,7 +363,9 @@ class SingleMsgHandler(MsgHandler):
         delPushWord = self.adminFunctionWord['delPushWord']
         if content.startswith(delPushWord):
             status = True
-            wxId = content.replace(delPushWord, '').strip()
+            parms = content.split(" ")
+            taskName = parms[1]
+            wxId = parms[2]
             if wxId.endswith('@chatroom'):
                 if self.drs.delPushRoom(wxId):
                     self.sendTextMsg(msg, f'{wxId} 已删除推送群')
@@ -371,7 +373,7 @@ class SingleMsgHandler(MsgHandler):
                 else:
                     self.sendTextMsg(msg, f'{wxId} 删除推送群失败')
             else:
-                if self.dus.delUser(wxId, self.getWxName(wxId)):
+                if self.dus.delUser(wxId, self.getWxName(taskName, wxId)):
                     self.sendTextMsg(msg, f'{wxId} 已删除推送群')
                     # self.whiteUsers.add(wxId)
                 else:
