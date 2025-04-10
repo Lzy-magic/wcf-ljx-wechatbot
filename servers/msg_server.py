@@ -106,7 +106,7 @@ class MsgHandler:
         # 给图片加上时间戳
         new_name = f'{msg.sender}_{msg.roomid}_{datetime.now().strftime("%Y%m%d%H%M%S")}{os.path.splitext(img_path)[1]}'
         shutil.move(img_path, os.path.join(picPath, new_name))
-        self.addChatMsg(msg.id, msg.sender, msg.roomid, "etype=图片")
+        self.addChatMsg(msg.sender, self.getWxName(msg.sender), msg.roomid, "etype=图片")
 
     def triggerFunction(self, msg, triggerType, triggerWords, chatid):
         content = msg.content.strip()
