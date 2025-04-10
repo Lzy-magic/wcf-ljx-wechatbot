@@ -1,6 +1,7 @@
 from queue import Empty
 from wcferry import Wcf
-from threading import Thread
+from threading import Thread, Event
+import time
 
 from utils.common import logger, initCacheFolder
 from servers.db_server import DbInitServer
@@ -16,6 +17,7 @@ class MainServer:
         self.smh = SingleMsgHandler(self.wcf)
         self.gmh = GhMsgHandler(self.wcf)
         self.sts = ScheduleTaskServer(self.wcf)
+        self.stop_event = Event()  # Used to signal threads to stop
         Thread(target=self.sts.run, name='定时推送服务').start()
         
     def initDateBase(self, ):
@@ -42,7 +44,7 @@ class MainServer:
     def processMsg(self, ):
         # 判断是否登录
         self.isLogin()
-        while self.wcf.is_receiving_msg():
+        while self.wcf.is_receiving_msg() and not self.stop_event.is_set():
             try:
                 msg = self.wcf.get_msg() # WxMsg 对象
                 logger.info(f'main_server 接收到消息: {msg.type} {msg.sender} {msg.roomid} {msg.content}')
@@ -60,11 +62,13 @@ class MainServer:
                     pass
 
             except Empty:
+                time.sleep(0.1)  # Add a small delay to reduce CPU usage
                 continue
             except KeyboardInterrupt:
-                logger.info("主程序收到 KeyboardInterrupt，准备退出...")
+                logger.info("processMsg 收到 KeyboardInterrupt，准备退出...")
                 self.wcf.disable_recv_msg()  # 停止接收消息
-                self.wcf.cleanup()  # 关闭连接，回收资源
+                self.wcf.cleanup()
+                self.stop_event.set()  # Signal threads to stop
                 break
 
 
@@ -75,6 +79,5 @@ if __name__ == '__main__':
         ms.processMsg()
     except KeyboardInterrupt:
         logger.info("主程序在顶层收到 KeyboardInterrupt，准备退出...")
-        # 在这里添加任何需要在程序完全退出前执行的清理代码
-        pass  # 或者执行其他清理操作
+    finally:
         logger.info("程序退出。")
