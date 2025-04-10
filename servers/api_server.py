@@ -799,9 +799,12 @@ class ApiServer:
 
     def getTopImageRank(self, room_id):
         image_ranks = dict(self.dms.showTodayImageRank(room_id))
-        image_content = '\n'.join(
-            [f'{index + 1}. {talker}: {talker_chat_count}' for index, (talker, talker_chat_count) in
-             enumerate(image_ranks.items())])
-        top_image_name = next(iter(image_ranks.items()))
-        image_content = f'水王：👑{top_image_name}👑\n🏊🌇>>>>图王Top10<<<<🌇\n{image_content}'
+        if image_ranks:
+            image_content = '\n'.join(
+                [f'{index + 1}. {talker}: {talker_chat_count}' for index, (talker, talker_chat_count) in
+                 enumerate(image_ranks.items())])
+            top_image_name = next(iter(image_ranks.items()))
+            image_content = f'水王：👑{top_image_name}👑\n🏊🌇>>>>图王Top10<<<<🌇\n{image_content}'
+        else:
+            image_content = "今天还没有人发图片哦~" 
         return image_content
