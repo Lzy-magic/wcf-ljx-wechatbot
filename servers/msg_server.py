@@ -273,6 +273,7 @@ class MsgHandler:
         self.dms.addChatMessage(wxId, self.wcf.get_alias_in_chatroom(wxId, roomId), roomId, content)
 
     def receiveStickerMag(self, msg):
+        logger.info("receiveStickerMag for room")
         self.addChatMsg(msg.sender, self.getWxName(msg.sender), msg.roomid, "etype=表情包")
 
 class SingleMsgHandler(MsgHandler):
@@ -616,7 +617,7 @@ class RoomMsgHandler(MsgHandler):
                 self.coreFunction(msg)
         elif msg.type == 3: # 图片消息
             self.receiveImgMsg(msg)
-        elif msg.type == '47':  # 表情包
+        elif msg.type == 47:  # 表情包
             self.receiveStickerMag(msg)
         else:
             self.parseMsg(msg)
