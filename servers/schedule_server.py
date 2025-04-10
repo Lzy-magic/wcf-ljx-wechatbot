@@ -163,17 +163,20 @@ class ScheduleTaskServer:
         try:
             for room_id, room_name in room_items:
                 chats = self.dms.showChatMessage(room_id)
-                chat_contents = '\n'.join([f'{chat[2]} {chat[0]}: {chat[1]}' for chat in chats])                
-                rank_contents = self.ams.getTopSummary(room_id)
-                if not chat_contents:
-                    chat_contents = '无聊天记录'
-                chat_contents = self.lta.getRoomMessSummary(chat_contents)
-                if chat_contents:
-                    self.wcf.send_text(msg=chat_contents, receiver=room_id)
-                    self.wcf.send_text(msg=rank_contents, receiver=room_id)
-                    logger.info(f'群{room_name}总结推送成功')
-                else:
-                    logger.info(f'群{room_name}总结推送失败')
+               # chat_contents = '\n'.join([f'{chat[2]} {chat[0]}: {chat[1]}' for chat in chats])
+                talk_contents = self.ams.getTopTalkRank(room_id)
+                image_contents = self.ams.getTopImageRank(room_id)
+                rank_contents = f'{talk_contents}\n{image_contents}'
+                # if not chat_contents:
+                #     chat_contents = '无聊天记录'
+                #ai总结准确率太低，故先去掉
+                #chat_contents = self.lta.getRoomMessSummary(chat_contents)
+                # if chat_contents:
+                # self.wcf.send_text(msg=chat_contents, receiver=room_id)
+                self.wcf.send_text(msg=rank_contents, receiver=room_id)
+                logger.info(f'群{room_name}总结推送成功')
+                # else:
+                #     logger.info(f'群{room_name}总结推送失败')
         except Exception as e:
             logger.error(f'群总结推送失败: {e}')
     

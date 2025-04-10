@@ -788,9 +788,20 @@ class ApiServer:
             logger.error(f'[-]: KFC疯狂星期四Api接口出现错误, 错误信息: {e}')
             return None
     
-    def getTopSummary(self, room_id):
+    def getTopTalkRank(self, room_id):
         ranks = dict(self.dms.showTodayRank(room_id))
-        rank_contents = '\n'.join([f'{index+1}. {talker}: {talker_chat_count}' for index, (talker, talker_chat_count) in enumerate(ranks.items())])
-        top_talker_name, top_talker_name_chat_count = next(iter(ranks.items()))
-        rank_contents = f'今日龙王为：👑{top_talker_name}👑\n\n 今日发言排行榜为：\n{rank_contents}'
+        rank_contents = '\n'.join(
+            [f'{index + 1}. {talker}: {talker_chat_count}' for index, (talker, talker_chat_count) in
+             enumerate(ranks.items())])
+        top_talker_name = next(iter(ranks.items()))
+        rank_contents = f'水王：👑{top_talker_name}👑\n🏊‍♀️>>>>水王Top10<<<<🏊‍♀️\n{rank_contents}'
         return rank_contents
+
+    def getTopImageRank(self, room_id):
+        image_ranks = dict(self.dms.showTodayImageRank(room_id))
+        image_ranks = '\n'.join(
+            [f'{index + 1}. {talker}: {talker_chat_count}' for index, (talker, talker_chat_count) in
+             enumerate(image_ranks.items())])
+        top_image_name = next(iter(image_ranks.items()))
+        image_content = f'水王：👑{top_image_name}👑\n🏊🌇>>>>图王Top10<<<<🌇\n{image_ranks}'
+        return image_content

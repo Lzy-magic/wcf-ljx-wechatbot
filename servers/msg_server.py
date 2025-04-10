@@ -117,6 +117,7 @@ class MsgHandler:
                 msg.sender = admin
                 msg.roomid = admin
                 #self.sendTextMsg(msg, f"{nickname}在{roomname}群发广告啦！")
+        self.addChatMsg(msg.id, msg.sender, msg.roomid, "etype=图片")
 
     def triggerFunction(self, msg, triggerType, triggerWords, chatid):
         content = msg.content.strip()
@@ -151,7 +152,9 @@ class MsgHandler:
             response = self.aps.getKfc()
             self.sendTextMsg(msg, response)
         elif triggerType == 'TopWords':            
-            content = self.aps.getTopSummary(chatid)
+            talk_content = self.aps.getTopTalkRank(chatid)
+            image_content = self.aps.getTopImageRank(chatid)
+            content = f"{talk_content}\n{image_content}"
             self.sendTextMsg(msg, content)
         else:
             bot_answer = f'[-]: 未知的触发器类型: {triggerType}, 请检查配置'
@@ -240,6 +243,7 @@ class MsgHandler:
                 # TODO: 处理图片、视频、语音等消息
                 msg.content = curText
                 logger.info(f'暂不支持引用{oriType}消息 {oriContent}')
+                self.addChatMsg(msg.sender, self.getWxName(msg.sender), msg.roomid, msg.content)
             self.coreFunction(msg)
         elif eType == '5': # 公众号消息
             # TODO: url 无法获取内容，待解决
@@ -254,25 +258,30 @@ class MsgHandler:
             if data:
                 response += f'\n摘要：{data["content"]}\n发布：{data["date"]}'
             self.sendTextMsg(msg, response)
+            self.addChatMsg(msg.sender, self.getWxName(msg.sender), msg.roomid, msg.content)
         elif eType == '51': # 视频号消息
             finderFeed = root.find('.//finderFeed')
             objectId = finderFeed.find('./objectId').text
             objectNonceId = finderFeed.find('./objectNonceId').text
             response = self.aps.getWxVideo(objectId, objectNonceId)
             self.sendTextMsg(msg, response)
+            self.addChatMsg(msg.sender, self.getWxName(msg.sender), msg.roomid, "etype=视频号")
         elif eType == '33': # 小程序消息
             logger.info(f'收到其他类型消息: {eType}')
             # content = curText + f'\n引用{oriName}的消息：{oriContent}'
             # msg.content = content
             # logger.info(f'处理后的消息: {content}')
-            # self.addChatMsg(msg.sender, self.getWxName(msg.sender), msg.roomid, msg.content)
+            self.addChatMsg(msg.sender, self.getWxName(msg.sender), msg.roomid, "etype=小程序")
+        elif eType == '47': # 表情包
+            self.addChatMsg(msg.sender, self.getWxName(msg.sender), msg.roomid, "etype=表情包")
         else:
             logger.info(f'收到其他类型消息: {eType}')
+            self.addChatMsg(msg.sender, self.getWxName(msg.sender), msg.roomid, "etype=其他类型")
             #response = f'收到{eType}消息，暂不支持处理，请联系群主安排开发'
            # self.sendTextMsg(msg, response)
 
     def addChatMsg(self, wxId, wxName, roomId, content):
-        self.dms.addChatMessage(wxId, wxName, roomId, content)
+        self.dms.addChatMessage(wxId, self.wcf.get_alias_in_chatroom(wxId, roomId), roomId, content)
 
 class SingleMsgHandler(MsgHandler):
     def __init__(self, wcf):
@@ -314,13 +323,11 @@ class SingleMsgHandler(MsgHandler):
             if wxId.endswith('@chatroom'):
                 if self.drs.addWhiteRoom(wxId, self.getWxName(wxId)):
                     self.sendTextMsg(msg, f'{wxId} 已添加群聊权限')
-                    # self.whiteRooms.add(wxId)
                 else:
                     self.sendTextMsg(msg, f'{wxId} 添加群聊权限失败')
             else:
                 if self.dus.addUser(wxId, self.getWxName(wxId)):
                     self.sendTextMsg(msg, f'{wxId} 已添加私聊权限')
-                    # self.whiteUsers.add(wxId)
                 else:
                     self.sendTextMsg(msg, f'{wxId} 添加私聊权限失败')
         # 删除私聊权限
@@ -350,13 +357,11 @@ class SingleMsgHandler(MsgHandler):
             if wxId.endswith('@chatroom'):
                 if self.drs.addPushRoom(taskName, wxId, self.getWxName(wxId)):
                     self.sendTextMsg(msg, f'{wxId} 已添加推送群')
-                    # self.whiteRooms.add(wxId)
                 else:
                     self.sendTextMsg(msg, f'{wxId} 添加推送群失败')
             else:
                 if self.dus.addUser(wxId, self.getWxName(wxId)):
                     self.sendTextMsg(msg, f'{wxId} 已添加推送群')
-                    # self.whiteUsers.add(wxId)
                 else:
                     self.sendTextMsg(msg, f'{wxId} 添加推送群失败')
         # 删除推送群
@@ -369,13 +374,11 @@ class SingleMsgHandler(MsgHandler):
             if wxId.endswith('@chatroom'):
                 if self.drs.delPushRoom(wxId):
                     self.sendTextMsg(msg, f'{wxId} 已删除推送群')
-                    # self.whiteRooms.add(wxId)
                 else:
                     self.sendTextMsg(msg, f'{wxId} 删除推送群失败')
             else:
                 if self.dus.delUser(wxId, self.getWxName(taskName, wxId)):
                     self.sendTextMsg(msg, f'{wxId} 已删除推送群')
-                    # self.whiteUsers.add(wxId)
                 else:
                     self.sendTextMsg(msg, f'{wxId} 删除推送群失败')
 
@@ -392,7 +395,6 @@ class SingleMsgHandler(MsgHandler):
             else:
                 if self.dus.delUser(wxId, self.getWxName(wxId)):
                     self.sendTextMsg(msg, f'{wxId} 已添加回复群')
-                    # self.whiteUsers.add(wxId)
                 else:
                     self.sendTextMsg(msg, f'{wxId} 添加回复群失败')
 
