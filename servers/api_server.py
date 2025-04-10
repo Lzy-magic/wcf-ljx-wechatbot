@@ -794,7 +794,7 @@ class ApiServer:
             [f'{index + 1}. {talker}: {talker_chat_count}' for index, (talker, talker_chat_count) in
              enumerate(ranks.items())])
         top_talker_name, top_talker_name_chat_count = next(iter(ranks.items()))
-        rank_contents = f'水王：👑{top_talker_name}👑\n🏊‍♀️>>>>水王Top10<<<<🏊‍♀️\n{rank_contents}'
+        rank_contents = f'>>>>水王：👑{top_talker_name}👑<<<<\n🏊‍♀️>>>>水王Top10<<<<🏊‍♀️\n{rank_contents}'
         return rank_contents
 
     def getTopImageRank(self, room_id):
@@ -804,7 +804,7 @@ class ApiServer:
                 [f'{index + 1}. {talker}: {talker_chat_count}' for index, (talker, talker_chat_count) in
                  enumerate(image_ranks.items())])
             top_talker_name, top_talker_name_chat_count = next(iter(image_ranks.items()))
-            image_content = f'图王：👑{top_talker_name}👑\n🏊🌇>>>>图王Top10<<<<🌇\n{image_content}'
+            image_content = f'>>>>图王：👑{top_talker_name}👑<<<<\n🏊🌇>>>>图王Top10<<<<🌇\n{image_content}'
         else:
             image_content = "今天还没有人发图片哦~" 
         return image_content

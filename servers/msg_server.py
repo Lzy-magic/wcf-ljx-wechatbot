@@ -143,7 +143,7 @@ class MsgHandler:
         elif triggerType == 'TopWords':            
             talk_content = self.aps.getTopTalkRank(chatid)
             image_content = self.aps.getTopImageRank(chatid)
-            content = f"{talk_content}\n{image_content}"
+            content = f"\n{talk_content}\n{image_content}"
             self.sendTextMsg(msg, content)
         else:
             bot_answer = f'[-]: 未知的触发器类型: {triggerType}, 请检查配置'

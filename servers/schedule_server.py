@@ -166,7 +166,7 @@ class ScheduleTaskServer:
                # chat_contents = '\n'.join([f'{chat[2]} {chat[0]}: {chat[1]}' for chat in chats])
                 talk_contents = self.ams.getTopTalkRank(room_id)
                 image_contents = self.ams.getTopImageRank(room_id)
-                rank_contents = f'{talk_contents}\n{image_contents}'
+                rank_contents = f'\n{talk_contents}\n{image_contents}'
                 # if not chat_contents:
                 #     chat_contents = '无聊天记录'
                 #ai总结准确率太低，故先去掉
