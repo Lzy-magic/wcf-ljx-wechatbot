@@ -213,7 +213,9 @@ class MsgHandler:
         """
         root = ET.fromstring(msg.content)
         appmsg = root.find('appmsg')
-        eType = appmsg.find('type').text
+        eType = ""
+        if appmsg:
+            eType = appmsg.find('type').text
         if eType == '57': # 引用消息
             if msg.from_group() and (not msg.is_at(self.wxid)):
                 return 
