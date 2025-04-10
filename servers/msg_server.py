@@ -257,7 +257,7 @@ class MsgHandler:
             data = self.lta.genArticleSum(urlOpen)
             if data:
                 response += f'\n摘要：{data["content"]}\n发布：{data["date"]}'
-            self.sendTextMsg(msg, response)
+            # self.sendTextMsg(msg, response)
             self.addChatMsg(msg.sender, self.getWxName(msg.sender), msg.roomid, msg.content)
         elif eType == '51': # 视频号消息
             finderFeed = root.find('.//finderFeed')
