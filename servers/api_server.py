@@ -804,7 +804,7 @@ class ApiServer:
                 [f'{index + 1}. {talker}: {talker_chat_count}' for index, (talker, talker_chat_count) in
                  enumerate(image_ranks.items())])
             top_talker_name, top_talker_name_chat_count = next(iter(image_ranks.items()))
-            image_content = f'水王：👑{top_talker_name}👑\n🏊🌇>>>>图王Top10<<<<🌇\n{image_content}'
+            image_content = f'图王：👑{top_talker_name}👑\n🏊🌇>>>>图王Top10<<<<🌇\n{image_content}'
         else:
             image_content = "今天还没有人发图片哦~" 
         return image_content
