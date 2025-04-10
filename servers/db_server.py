@@ -343,7 +343,7 @@ class DbMsgServer:
         conn, cursor = openDb(messageDb)
         try:
             cursor.execute(
-                "select wxName, count(*) as count from chatMessage where chatMessage.roomId = ? and strftime('%Y-%m-%d', createTime, 'localtime') = strftime('%Y-%m-%d', 'now', 'localtime') and content == 'etype=图片' OR content == 'etype=表情包' group by wxId order by count desc LIMIT 10;",
+                "select wxName, count(*) as count from chatMessage where chatMessage.roomId = ? and strftime('%Y-%m-%d', createTime, 'localtime') = strftime('%Y-%m-%d', 'now', 'localtime') and (content == 'etype=图片' OR content == 'etype=表情包') group by wxId order by count desc LIMIT 10;",
                 (roomId,))
             result = cursor.fetchall()
             closeDb(conn, cursor)
