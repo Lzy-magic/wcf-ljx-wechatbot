@@ -623,7 +623,7 @@ class RoomMsgHandler(MsgHandler):
             self.coreFunction(msg)
         elif msg.type == 3: # 图片消息
             self.receiveImgMsg(msg)
-        elif msg.type == 49: # 引用消息 公众号/视频号消息
+        else:
             self.parseMsg(msg)
         
 class GhMsgHandler(MsgHandler):
