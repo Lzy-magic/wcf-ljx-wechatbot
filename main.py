@@ -65,8 +65,7 @@ class MainServer:
                 logger.info("主程序收到 KeyboardInterrupt，准备退出...")
                 self.wcf.disable_recv_msg()  # 停止接收消息
                 self.wcf.cleanup()  # 关闭连接，回收资源
-                break
-
+                raise KeyboardInterrupt
 
 if __name__ == '__main__':
     ms = MainServer()
