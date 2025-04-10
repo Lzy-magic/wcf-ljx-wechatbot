@@ -70,4 +70,11 @@ class MainServer:
 if __name__ == '__main__':
     ms = MainServer()
     logger.info('main_server 启动成功！！！')
-    ms.processMsg()
+    try:
+        ms.processMsg()
+    except KeyboardInterrupt:
+        logger.info("主程序在顶层收到 KeyboardInterrupt，准备退出...")
+        # 在这里添加任何需要在程序完全退出前执行的清理代码
+        pass  # 或者执行其他清理操作
+    finally:
+        logger.info("程序退出。")
