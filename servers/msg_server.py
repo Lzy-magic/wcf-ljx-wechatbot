@@ -608,10 +608,11 @@ class RoomMsgHandler(MsgHandler):
         # 开始处理消息
         if msg.type == 1: # 文本消息
             self.addChatMsg(sender, self.getWxName(sender), roomId, msg.content)
-        if msg.type == 1 and msg.is_at(self.wxid): # 文本消息
-            msg.content = re.sub(r"@.*?[\u2005|\s]", "", msg.content) # 删除 content 字符串中以 @ 开头，后跟任意字符，直到遇到中文空格或普通空白字符的部分
-            logger.info(f'收到群消息: {msg.content}')
-            self.coreFunction(msg)
+            if msg.is_at(self.wxid):
+                msg.content = re.sub(r"@.*?[\u2005|\s]", "",
+                                     msg.content)  # 删除 content 字符串中以 @ 开头，后跟任意字符，直到遇到中文空格或普通空白字符的部分
+                logger.info(f'收到群消息: {msg.content}')
+                self.coreFunction(msg)
         elif msg.type == 3: # 图片消息
             self.receiveImgMsg(msg)
         else:
