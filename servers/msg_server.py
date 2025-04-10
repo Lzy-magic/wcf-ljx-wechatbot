@@ -106,17 +106,6 @@ class MsgHandler:
         # 给图片加上时间戳
         new_name = f'{msg.sender}_{msg.roomid}_{datetime.now().strftime("%Y%m%d%H%M%S")}{os.path.splitext(img_path)[1]}'
         shutil.move(img_path, os.path.join(picPath, new_name))
-        # 判断是否为广告图片
-        answer = self.lra.isAdPic(os.path.join(picPath, new_name))
-        logger.info(f'图片是否为广告图片: {answer}')
-        if answer == '是':
-            #self.sendTextMsg(msg, '你小子是不是准备发广告？小心被群主发现！')
-            nickname = self.getWxName(msg.sender)
-            roomname = self.getWxName(msg.roomid)
-            for admin in self.superAdmins:    
-                msg.sender = admin
-                msg.roomid = admin
-                #self.sendTextMsg(msg, f"{nickname}在{roomname}群发广告啦！")
         self.addChatMsg(msg.id, msg.sender, msg.roomid, "etype=图片")
 
     def triggerFunction(self, msg, triggerType, triggerWords, chatid):
