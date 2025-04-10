@@ -1,1 +1,1 @@
-cmd.exe git pull && python main.py
+cmd.exe /c git pull && python main.py
