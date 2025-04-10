@@ -263,8 +263,6 @@ class MsgHandler:
             # msg.content = content
             # logger.info(f'处理后的消息: {content}')
             self.addChatMsg(msg.sender, self.getWxName(msg.sender), msg.roomid, "etype=小程序")
-        elif eType == '47': # 表情包
-            self.addChatMsg(msg.sender, self.getWxName(msg.sender), msg.roomid, "etype=表情包")
         else:
             logger.info(f'收到其他类型消息: {eType}')
             self.addChatMsg(msg.sender, self.getWxName(msg.sender), msg.roomid, "etype=其他类型")
@@ -273,6 +271,9 @@ class MsgHandler:
 
     def addChatMsg(self, wxId, wxName, roomId, content):
         self.dms.addChatMessage(wxId, self.wcf.get_alias_in_chatroom(wxId, roomId), roomId, content)
+
+    def receiveStickerMag(self, msg):
+        self.addChatMsg(msg.sender, self.getWxName(msg.sender), msg.roomid, "etype=表情包")
 
 class SingleMsgHandler(MsgHandler):
     def __init__(self, wcf):
@@ -615,6 +616,8 @@ class RoomMsgHandler(MsgHandler):
                 self.coreFunction(msg)
         elif msg.type == 3: # 图片消息
             self.receiveImgMsg(msg)
+        elif msg.type == '47':  # 表情包
+            self.receiveStickerMag(msg)
         else:
             self.parseMsg(msg)
         
